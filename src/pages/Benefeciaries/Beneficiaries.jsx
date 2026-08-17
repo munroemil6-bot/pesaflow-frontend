@@ -1,3 +1,40 @@
+      import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+// Replace with your actual slice actions/selectors
+import { fetchBeneficiaries, deleteBeneficiary } from '../redux/beneficiarySlice';
+
+const BeneficiariesPage = () => {}
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // Extract state from beneficiarySlice
+  const { list: beneficiaries, isLoading, error } = useSelector(
+    (state) => state.beneficiaries
+  );
+
+  useEffect(() => {
+    dispatch(fetchBeneficiaries());
+  }, [dispatch]);
+
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to remove this beneficiary?')) {
+      dispatch(deleteBeneficiary(id));
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p className="text-gray-500 font-medium">Loading beneficiaries...</p>
+      </div>
+    );
+  }
+
+  
+     
+             
+
 /**
  * ========================================================
  * BENEFICIARIES PAGE
@@ -57,7 +94,7 @@
 import React from 'react';
 // TODO: Import useNavigate from react-router-dom
 
-export default function Beneficiaries() {
+
   // TODO: Set up useNavigate hook
   // TODO: Create state for isLoading
   // TODO: Create state for beneficiaries (use mock data for Week 1)
@@ -73,4 +110,4 @@ export default function Beneficiaries() {
   // 5. "+ Add Beneficiary" button at bottom → /beneficiaries/add
   
   return <div>{/* NAOMI: Build beneficiaries list here */}</div>;
-}
+
