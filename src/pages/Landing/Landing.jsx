@@ -88,7 +88,7 @@ export default function Landing() {
                   </Button>
                 </Link>
                 <Link to="/auth/login">
-                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                  <Button size="lg" variant="outline" className="border-white text-black hover:bg-white/10">
                     Sign In
                   </Button>
                 </Link>
@@ -273,6 +273,7 @@ export default function Landing() {
       <footer className="border-t border-slate-200 bg-slate-900 text-slate-300 px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-8 md:grid-cols-4 mb-8">
+
             {/* Brand */}
             <div>
               <div className="flex items-center gap-2 mb-4">
@@ -281,9 +282,12 @@ export default function Landing() {
                 </div>
                 <div>
                   <p className="font-bold text-white">PesaFlow</p>
-                  <p className="text-xs uppercase tracking-[0.15em] text-slate-500">Money Transfer</p>
+                  <p className="text-xs uppercase tracking-[0.15em] text-slate-500">
+                    Money Transfer
+                  </p>
                 </div>
               </div>
+
               <p className="text-sm text-slate-400">
                 Fast, secure money transfers for everyone in Kenya.
               </p>
@@ -293,9 +297,14 @@ export default function Landing() {
             <div>
               <h4 className="font-semibold text-white mb-4">Product</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition">Features</a></li>
-                <li><a href="#" className="hover:text-white transition">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition">Security</a></li>
+                <li>
+                  PesaFlow provides a simple and convenient way to send and receive
+                  money through a secure digital platform.
+                </li>
+                <li>
+                  Users can initiate transfers and monitor their transaction activity
+                  from one place.
+                </li>
               </ul>
             </div>
 
@@ -303,9 +312,14 @@ export default function Landing() {
             <div>
               <h4 className="font-semibold text-white mb-4">Company</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition">About</a></li>
-                <li><a href="#" className="hover:text-white transition">Blog</a></li>
-                <li><a href="#" className="hover:text-white transition">Careers</a></li>
+                <li>
+                  PesaFlow is designed to make digital money transfers easier,
+                  faster, and more accessible.
+                </li>
+                <li>
+                  Our goal is to provide a straightforward experience for everyday
+                  financial transactions.
+                </li>
               </ul>
             </div>
 
@@ -313,11 +327,17 @@ export default function Landing() {
             <div>
               <h4 className="font-semibold text-white mb-4">Legal</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition">Privacy</a></li>
-                <li><a href="#" className="hover:text-white transition">Terms</a></li>
-                <li><a href="#" className="hover:text-white transition">Contact</a></li>
+                <li>
+                  Your transaction information should be handled securely and
+                  responsibly.
+                </li>
+                <li>
+                  PesaFlow is designed with privacy and secure transaction handling
+                  in mind.
+                </li>
               </ul>
             </div>
+
           </div>
 
           {/* Bottom bar */}
