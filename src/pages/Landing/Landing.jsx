@@ -210,7 +210,9 @@ export default function Landing() {
           {/* CTA Button */}
           <div className="flex justify-center">
             <Link to="/auth/register">
-              <Button size="lg">Start Your Journey</Button>
+            <Button size="lg" className="bg-green-505 hover:bg-green-600 text-black shadow-sm shadow-green-600/30 focus:ring-green-500/40">
+              Start Your Journey
+            </Button>
             </Link>
           </div>
         </div>
