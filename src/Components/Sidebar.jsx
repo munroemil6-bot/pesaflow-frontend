@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 const menuItems = [
   { label: 'Dashboard', to: '/dashboard' },
@@ -10,10 +10,17 @@ const menuItems = [
 ]
 
 export default function Sidebar() {
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    // TODO: Clear user data from Redux/localStorage
+    navigate('/')
+  }
+
   return (
     <aside className="hidden w-72 border-r border-slate-200 bg-slate-50/80 p-5 lg:block">
       <div className="mb-8 flex items-center gap-3 px-2">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-lg font-bold text-white shadow-lg shadow-blue-500/20">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-green-600 to-emerald-500 text-lg font-bold text-white shadow-lg shadow-green-500/20">
           P
         </div>
         <div>
@@ -41,10 +48,19 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="mt-10 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-700 p-4 text-white shadow-xl shadow-slate-900/10">
-        <p className="text-xs uppercase tracking-[0.2em] text-slate-300">Security</p>
-        <h3 className="mt-2 text-lg font-semibold">Protected</h3>
-        <p className="mt-1 text-sm text-slate-300">All transactions are encrypted and verified.</p>
+      <div className="mt-10 space-y-3">
+        <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-700 p-4 text-white shadow-xl shadow-slate-900/10">
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-300">Security</p>
+          <h3 className="mt-2 text-lg font-semibold">Protected</h3>
+          <p className="mt-1 text-sm text-slate-300">All transactions are encrypted and verified.</p>
+        </div>
+
+        <button
+          onClick={handleLogout}
+          className="w-full rounded-xl bg-red-50 px-4 py-2.5 font-medium text-red-600 transition hover:bg-red-100 hover:text-red-700"
+        >
+          Logout
+        </button>
       </div>
     </aside>
   )

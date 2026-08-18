@@ -1,0 +1,6 @@
+services:
+  pesaflowfrontend:
+    image: pesaflowfrontend
+    build:
+      context: .
+      dockerfile: ./Dockerfile
