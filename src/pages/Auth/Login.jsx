@@ -68,25 +68,30 @@
  */
 
 import { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import Button from '../../Components/Button'
 import Input from '../../Components/Input'
+import { loginUser } from '../../redux/slices/authSlice'
 
 export default function Login() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const [formData, setFormData] = useState({ emailOrPhone: '', password: '' })
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
   const handleChange = ({ target: { name, value } }) => {
     setFormData((current) => ({ ...current, [name]: value }))
     setErrors((current) => ({ ...current, [name]: undefined }))
     setMessage('')
+    setErrorMessage('')
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     const identifier = formData.emailOrPhone.trim()
     const phone = identifier.replace(/[\s-]/g, '')
@@ -97,14 +102,18 @@ export default function Login() {
     else if (formData.password.length < 6) nextErrors.password = 'Your password must be at least 6 characters.'
     setErrors(nextErrors)
     setMessage('')
+    setErrorMessage('')
     if (Object.keys(nextErrors).length) return
     setIsLoading(true)
-    // Temporary front-end MVP flow. Replace with the Flask login endpoint when ready.
-    window.setTimeout(() => {
-      setIsLoading(false)
+    try {
+      await dispatch(loginUser(formData)).unwrap()
       setMessage('Login successful. Taking you to your dashboard…')
       window.setTimeout(() => navigate('/dashboard'), 650)
-    }, 550)
+    } catch (error) {
+      setErrorMessage(error.message || 'We could not log you in. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -120,6 +129,7 @@ export default function Login() {
             <Link to="/" className="inline-flex items-center gap-2 text-lg font-bold text-emerald-700 lg:hidden"><span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-600 text-sm text-white">P</span>PesaFlow</Link>
             <div className="mt-8 lg:mt-0"><p className="text-sm font-semibold text-emerald-600">WELCOME BACK</p><h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">Log in to PesaFlow</h2><p className="mt-2 text-sm leading-6 text-slate-600">Enter your details to access your wallet and transfers.</p></div>
             {message && <div role="status" className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{message}</div>}
+            {errorMessage && <div role="alert" className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{errorMessage}</div>}
             <form className="mt-7 space-y-5" onSubmit={handleSubmit} noValidate>
               <Input label="Email address or phone number" id="emailOrPhone" name="emailOrPhone" value={formData.emailOrPhone} onChange={handleChange} placeholder="Enter your email address or phone number" autoComplete="username" error={errors.emailOrPhone} />
               <div><div className="mb-2 flex items-center justify-between gap-3"><label htmlFor="password" className="block text-sm font-medium text-slate-700">Password</label><Link to="/auth/forgot-password" className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:underline">Forgot password?</Link></div><div className="relative"><Input id="password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleChange} placeholder="Enter your password" autoComplete="current-password" error={errors.password} className="pr-16" /><button type="button" onClick={() => setShowPassword((visible) => !visible)} className="absolute right-3 top-2.5 text-sm font-medium text-slate-500 hover:text-emerald-600" aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? 'Hide' : 'Show'}</button></div></div>
