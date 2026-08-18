@@ -1,0 +1,28 @@
+import { createSlice } from '@reduxjs/toolkit'
+
+const transactionSlice = createSlice({
+  name: 'transactions',
+  initialState: { list: [], recent: [], selected: null, isLoading: false, error: null },
+  reducers: {
+    setTransactions(state, action) {
+      state.list = action.payload
+      state.recent = action.payload.slice(0, 5)
+    },
+    addTransaction(state, action) {
+      state.list.unshift(action.payload)
+      state.recent = state.list.slice(0, 5)
+    },
+    setSelectedTransaction(state, action) {
+      state.selected = action.payload
+    },
+    setTransactionLoading(state, action) {
+      state.isLoading = action.payload
+    },
+    setTransactionError(state, action) {
+      state.error = action.payload
+    },
+  },
+})
+
+export const { addTransaction, setSelectedTransaction, setTransactionError, setTransactionLoading, setTransactions } = transactionSlice.actions
+export default transactionSlice.reducer
