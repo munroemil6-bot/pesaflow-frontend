@@ -19,12 +19,7 @@ function TransactionDetails() {
     setError("");
 
     try {
-      /*
-       * Replace this URL with your real backend API.
-       *
-       * Example:
-       * http://127.0.0.1:8000/api/transactions/${id}/
-       */
+      
 
       const response = await fetch(
         `http://127.0.0.1:8000/api/transactions/${id}/`
@@ -48,12 +43,12 @@ function TransactionDetails() {
     }
   };
 
-  // Format money
+  
   const formatMoney = (amount) => {
     return `KSh ${Number(amount).toLocaleString()}`;
   };
 
-  // Format date
+  
   const formatDate = (date) => {
     if (!date) return "N/A";
 
@@ -64,7 +59,7 @@ function TransactionDetails() {
     });
   };
 
-  // Download receipt
+  
   const downloadReceipt = () => {
     if (!transaction) return;
 
@@ -121,7 +116,7 @@ Thank you for using PesaFlow.
     URL.revokeObjectURL(url);
   };
 
-  // Loading state
+  
   if (loading) {
     return (
       <div className="transaction-page">
@@ -136,7 +131,7 @@ Thank you for using PesaFlow.
     );
   }
 
-  // Error state
+  
   if (error) {
     return (
       <div className="transaction-page">
@@ -158,7 +153,7 @@ Thank you for using PesaFlow.
     );
   }
 
-  // Transaction details
+  
   return (
     <div className="transaction-page">
       <div className="transaction-card">
