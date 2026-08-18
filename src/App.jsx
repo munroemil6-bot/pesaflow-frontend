@@ -4,7 +4,7 @@ import React, { Suspense } from 'react'
 import Navbar from './Components/Navbar'
 import Sidebar from './Components/Sidebar'
 import Loader from './Components/Loader'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 
 const Landing = React.lazy(() => import('./pages/Landing/Landing'))
 const Login = React.lazy(() => import('./pages/Auth/Login'))
@@ -36,94 +36,102 @@ function ProtectedRoute({ children }) {
   return children
 }
 
+function AppContent() {
+  const location = useLocation()
+  const isPublicPage = location.pathname === '/' || location.pathname.startsWith('/auth/')
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {!isPublicPage && <Navbar />}
+      <div className="flex">
+        {!isPublicPage && <Sidebar />}
+        <main className={isPublicPage ? 'w-full' : 'flex-1'}>
+          <Suspense fallback={<Loader />}>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Landing />} />
+              
+              {/* Auth Routes */}
+              <Route path="/auth/login" element={<Login />} />
+              <Route path="/auth/register" element={<Register />} />
+              <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+              
+              {/* User Routes (Protected) */}
+              <Route 
+                path="/dashboard" 
+                element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/wallet" 
+                element={<ProtectedRoute><Wallet /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/wallet/add-funds" 
+                element={<ProtectedRoute><AddFunds /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/beneficiaries" 
+                element={<ProtectedRoute><Beneficiaries /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/beneficiaries/add" 
+                element={<ProtectedRoute><AddBeneficiary /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/transactions" 
+                element={<ProtectedRoute><Transactions /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/transactions/:id" 
+                element={<ProtectedRoute><TransactionDetails /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/transfer/send" 
+                element={<ProtectedRoute><SendMoney /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/transfer/confirm" 
+                element={<ProtectedRoute><ConfirmTransfer /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/transfer/status" 
+                element={<ProtectedRoute><TrasferStatus /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/profile" 
+                element={<ProtectedRoute><Profile /></ProtectedRoute>} 
+              />
+              
+              {/* Admin Routes (Protected - Admin Only) */}
+              <Route 
+                path="/admin/dashboard" 
+                element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/admin/analytics" 
+                element={<ProtectedRoute><Analytics /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/admin/users" 
+                element={<ProtectedRoute><Users /></ProtectedRoute>} 
+              />
+              
+              {/* Redirect unknown routes to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </main>
+      </div>
+    </div>
+  )
+}
+
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
-        {/* TODO: Add Navbar here */}
-        
-        <div className="flex">
-          {/* TODO: Add Sidebar here */}
-          
-          <main className="flex-1">
-            <Suspense fallback={<LoadingSpinner />}>
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Landing />} />
-                
-                {/* Auth Routes */}
-                <Route path="/auth/login" element={<Login />} />
-                <Route path="/auth/register" element={<Register />} />
-                <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-                
-                {/* User Routes (Protected) */}
-                <Route 
-                  path="/dashboard" 
-                  element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} 
-                />
-                <Route 
-                  path="/wallet" 
-                  element={<ProtectedRoute><Wallet /></ProtectedRoute>} 
-                />
-                <Route 
-                  path="/wallet/add-funds" 
-                  element={<ProtectedRoute><AddFunds /></ProtectedRoute>} 
-                />
-                <Route 
-                  path="/beneficiaries" 
-                  element={<ProtectedRoute><Beneficiaries /></ProtectedRoute>} 
-                />
-                <Route 
-                  path="/beneficiaries/add" 
-                  element={<ProtectedRoute><AddBeneficiary /></ProtectedRoute>} 
-                />
-                <Route 
-                  path="/transactions" 
-                  element={<ProtectedRoute><Transactions /></ProtectedRoute>} 
-                />
-                <Route 
-                  path="/transactions/:id" 
-                  element={<ProtectedRoute><TransactionDetails /></ProtectedRoute>} 
-                />
-                <Route 
-                  path="/transfer/send" 
-                  element={<ProtectedRoute><SendMoney /></ProtectedRoute>} 
-                />
-                <Route 
-                  path="/transfer/confirm" 
-                  element={<ProtectedRoute><ConfirmTransfer /></ProtectedRoute>} 
-                />
-                <Route 
-                  path="/transfer/status" 
-                  element={<ProtectedRoute><TrasferStatus /></ProtectedRoute>} 
-                />
-                <Route 
-                  path="/profile" 
-                  element={<ProtectedRoute><Profile /></ProtectedRoute>} 
-                />
-                
-                {/* Admin Routes (Protected - Admin Only) */}
-                <Route 
-                  path="/admin/dashboard" 
-                  element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} 
-                />
-                <Route 
-                  path="/admin/analytics" 
-                  element={<ProtectedRoute><Analytics /></ProtectedRoute>} 
-                />
-                <Route 
-                  path="/admin/users" 
-                  element={<ProtectedRoute><Users /></ProtectedRoute>} 
-                />
-                
-                {/* Redirect unknown routes to home */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </Suspense>
-          </main>
-        </div>
-      </div>
+      <AppContent />
     </Router>
   )
 }
 
+export default App
