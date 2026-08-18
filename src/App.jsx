@@ -1,10 +1,11 @@
+
 import './App.css'
 import React, { Suspense } from 'react'
-
-// Import React Router components
+import Navbar from './Components/Navbar'
+import Sidebar from './Components/Sidebar'
+import Loader from './Components/Loader'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 
-// Lazy load page components for better performance
 const Landing = React.lazy(() => import('./pages/Landing/Landing'))
 const Login = React.lazy(() => import('./pages/Auth/Login'))
 const Register = React.lazy(() => import('./pages/Auth/Register'))
@@ -25,19 +26,8 @@ const TrasferStatus = React.lazy(() => import('./pages/Transfer/TrasferStatus'))
 const Profile = React.lazy(() => import('./pages/Landing/Profile'))
 
 // TODO: Import layout components when created
-// import Navbar from './Components/Navbar'
-// import Sidebar from './Components/Sidebar'
 
-// Loading component
-function LoadingSpinner() {
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin">
-        <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full"></div>
-      </div>
-    </div>
-  )
-}
+
 
 // Protected Route Component (TODO: implement after Redux is set up)
 function ProtectedRoute({ children }) {
@@ -137,4 +127,3 @@ function App() {
   )
 }
 
-export default App
