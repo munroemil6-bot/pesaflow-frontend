@@ -14,24 +14,6 @@ PesaFlow is a comprehensive frontend application that enables users to send mone
 - React Router - Client-side routing and navigation
 - Redux Toolkit - State management (setup ready)
 
-## Project Structure
-
-```
-src/
-├── Components/       # Reusable UI components
-├── pages/           # Page components organized by feature
-│   ├── Auth/        # Authentication pages
-│   ├── Dashboards/  # Admin and user dashboards
-│   ├── Wallet/      # Wallet management
-│   ├── Transactions/# Transaction history and details
-│   ├── Transfer/    # Money transfer flow
-│   ├── Beneficiaries/# Beneficiary management
-│   └── Landing/     # Landing and profile pages
-├── layouts/         # Layout wrappers
-├── redux/          # State management (to be implemented)
-├── services/       # API service layer (to be implemented)
-└── data/           # Mock data and constants
-```
 
 ## Features
 
