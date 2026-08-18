@@ -1,46 +1,104 @@
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Link, useNavigate } from 'react-router-dom'
-import { deleteBeneficiary, fetchBeneficiaries } from '../../redux/slices/beneficiarySlice'
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
+const mockBeneficiaries = [
+  { id: 1, name: 'John Kamau', phone: '0712 345 678', bank: 'KCB' },
+  { id: 2, name: 'Mary Wanjiku', phone: '0798 765 432', bank: 'Equity' },
+  { id: 3, name: 'Peter Mwangi', phone: '0744 111 222', bank: 'Co-op Bank' },
+];
 
 export default function BeneficiariesPage() {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const { list: beneficiaries, isLoading, error } = useSelector((state) => state.beneficiaries)
-
-  useEffect(() => {
-    dispatch(fetchBeneficiaries())
-  }, [dispatch])
+  const navigate = useNavigate();
+  const [beneficiaries, setBeneficiaries] = useState(mockBeneficiaries);
+  const [isLoading] = useState(false);
 
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to remove this beneficiary?')) dispatch(deleteBeneficiary(id))
-  }
+    if (window.confirm('Are you sure you want to remove this beneficiary?')) {
+      setBeneficiaries((current) => current.filter((beneficiary) => beneficiary.id !== id));
+    }
+  };
 
   if (isLoading) {
-    return <div className="flex h-64 items-center justify-center"><p className="font-medium text-slate-500">Loading beneficiaries...</p></div>
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <p className="text-sm font-medium text-slate-500">Loading beneficiaries...</p>
+      </div>
+    );
   }
 
   return (
-    <section className="mx-auto max-w-3xl p-4 sm:p-6">
-      <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div><h1 className="text-2xl font-bold text-slate-900">Beneficiaries</h1><p className="mt-1 text-sm text-slate-500">Your saved contacts for faster transfers</p></div>
-        <Link to="/beneficiaries/add" className="rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700">Add beneficiary</Link>
-      </header>
-
-      {error && <div role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>}
+    <div className="mx-auto max-w-4xl p-4 sm:p-6">
+      <div className="mb-6 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium uppercase tracking-[0.2em] text-blue-600">People</p>
+          <h1 className="mt-1 text-3xl font-bold text-slate-900">
+            Beneficiaries ({beneficiaries.length})
+          </h1>
+        </div>
+        <Link
+          to="/beneficiaries/add"
+          className="inline-flex items-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm shadow-blue-600/30 transition hover:bg-blue-700"
+        >
+          + Add Beneficiary
+        </Link>
+      </div>
 
       {beneficiaries.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm"><p className="font-medium text-slate-800">No beneficiaries saved yet.</p><p className="mt-1 text-sm text-slate-500">Add a trusted recipient before sending money.</p><Link to="/beneficiaries/add" className="mt-5 inline-block font-semibold text-emerald-600 hover:text-emerald-700 hover:underline">Add your first beneficiary</Link></div>
+        <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
+          <p className="text-lg font-medium text-slate-700">No saved beneficiaries yet.</p>
+          <p className="mt-2 text-sm text-slate-500">Add someone you send money to often.</p>
+          <Link
+            to="/beneficiaries/add"
+            className="mt-5 inline-flex rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            + Add Your First Beneficiary
+          </Link>
+        </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {beneficiaries.map((beneficiary) => (
-            <article key={beneficiary.id} className="flex flex-col justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
-              <div><h2 className="font-semibold text-slate-900">{beneficiary.name}</h2><p className="mt-1 text-sm text-slate-600">{beneficiary.phone}</p></div>
-              <div className="flex flex-wrap gap-2"><button type="button" onClick={() => navigate(`/transfer/send?beneficiary_id=${beneficiary.id}`)} className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Send money</button><button type="button" onClick={() => handleDelete(beneficiary.id)} className="rounded-lg px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">Remove</button></div>
-            </article>
+            <div
+              key={beneficiary.id}
+              className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-lg font-semibold text-blue-700">
+                  {beneficiary.name.charAt(0)}
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">{beneficiary.name}</h3>
+                  <p className="text-sm text-slate-500">{beneficiary.phone}</p>
+                  <p className="text-xs uppercase tracking-[0.15em] text-slate-400">{beneficiary.bank}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => navigate(`/transfer/send?beneficiary_id=${beneficiary.id}`)}
+                  className="rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                >
+                  Send Money
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/beneficiaries/edit/${beneficiary.id}`)}
+                  className="rounded-xl bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(beneficiary.id)}
+                  className="rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       )}
-    </section>
-  )
+    </div>
+  );
 }
