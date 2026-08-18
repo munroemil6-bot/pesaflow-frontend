@@ -1,108 +1,96 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// Replace with your actual slice actions/selectors
-import { fetchBeneficiaries, deleteBeneficiary } from '../redux/beneficiarySlice';
 
-const BeneficiariesPage = () => {}
-  const dispatch = useDispatch();
+const mockBeneficiaries = [
+  { id: 1, name: 'John Kamau', phone: '0712 345 678', bank: 'KCB' },
+  { id: 2, name: 'Mary Wanjiku', phone: '0798 765 432', bank: 'Equity' },
+  { id: 3, name: 'Peter Mwangi', phone: '0744 111 222', bank: 'Co-op Bank' },
+];
+
+export default function BeneficiariesPage() {
   const navigate = useNavigate();
-
-  // Extract state from beneficiarySlice
-  const { list: beneficiaries, isLoading, error } = useSelector(
-    (state) => state.beneficiaries
-  );
-
-  useEffect(() => {
-    dispatch(fetchBeneficiaries());
-  }, [dispatch]);
+  const [beneficiaries, setBeneficiaries] = useState(mockBeneficiaries);
+  const [isLoading] = useState(false);
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to remove this beneficiary?')) {
-      dispatch(deleteBeneficiary(id));
+      setBeneficiaries((current) => current.filter((beneficiary) => beneficiary.id !== id));
     }
   };
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <p className="text-gray-500 font-medium">Loading beneficiaries...</p>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <p className="text-gray-500 font-medium">Loading beneficiaries...</p>
+      <div className="flex h-64 items-center justify-center">
+        <p className="text-sm font-medium text-slate-500">Loading beneficiaries...</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto p-4 sm:p-6 bg-white rounded-lg shadow-md">
-      {/* Page Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Beneficiaries ({beneficiaries?.length || 0})
-        </h1>
-        <p className="text-sm text-gray-500">Your saved beneficiaries</p>
+    <div className="mx-auto max-w-4xl p-4 sm:p-6">
+      <div className="mb-6 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium uppercase tracking-[0.2em] text-blue-600">People</p>
+          <h1 className="mt-1 text-3xl font-bold text-slate-900">
+            Beneficiaries ({beneficiaries.length})
+          </h1>
+        </div>
+        <Link
+          to="/beneficiaries/add"
+          className="inline-flex items-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm shadow-blue-600/30 transition hover:bg-blue-700"
+        >
+          + Add Beneficiary
+        </Link>
       </div>
 
-      {/* Error Banner */}
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded">
-          {error}
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!isLoading && beneficiaries?.length === 0 ? (
-        <div className="text-center py-8 bg-gray-50 rounded-lg mb-6">
-          <p className="text-gray-500 mb-4">No saved beneficiaries found.</p>
+      {beneficiaries.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
+          <p className="text-lg font-medium text-slate-700">No saved beneficiaries yet.</p>
+          <p className="mt-2 text-sm text-slate-500">Add someone you send money to often.</p>
           <Link
             to="/beneficiaries/add"
-            className="inline-block px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+            className="mt-5 inline-flex rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
           >
             + Add Your First Beneficiary
           </Link>
         </div>
       ) : (
-        /* Beneficiaries List */
-        <div className="space-y-4 mb-6">
-          {beneficiaries.map((b) => (
+        <div className="space-y-4">
+          {beneficiaries.map((beneficiary) => (
             <div
-              key={b.id}
-              className="p-4 border border-gray-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-gray-300 transition-all"
+              key={beneficiary.id}
+              className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div>
-                <h3 className="font-semibold text-gray-800">{b.name}</h3>
-                <p className="text-sm text-gray-600">{b.phone}</p>
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-lg font-semibold text-blue-700">
+                  {beneficiary.name.charAt(0)}
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">{beneficiary.name}</h3>
+                  <p className="text-sm text-slate-500">{beneficiary.phone}</p>
+                  <p className="text-xs uppercase tracking-[0.15em] text-slate-400">{beneficiary.bank}</p>
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Send Money Action Button */}
                 <button
-                  onClick={() => navigate(`/transfer/send?beneficiary_id=${b.id}`)}
-                  className="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
+                  type="button"
+                  onClick={() => navigate(`/transfer/send?beneficiary_id=${beneficiary.id}`)}
+                  className="rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
                 >
                   Send Money
                 </button>
-
-                {/* Edit Button (Optional Week 1) */}
                 <button
-                  onClick={() => navigate(`/beneficiaries/edit/${b.id}`)}
-                  className="px-2 py-1.5 text-gray-600 hover:text-gray-900 text-sm font-medium"
-                  title="Edit"
+                  type="button"
+                  onClick={() => navigate(`/beneficiaries/edit/${beneficiary.id}`)}
+                  className="rounded-xl bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200"
                 >
                   Edit
                 </button>
-
-                {/* Delete Button (Optional Week 1) */}
                 <button
-                  onClick={() => handleDelete(b.id)}
-                  className="px-2 py-1.5 text-red-600 hover:text-red-800 text-sm font-medium"
-                  title="Delete"
+                  type="button"
+                  onClick={() => handleDelete(beneficiary.id)}
+                  className="rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100"
                 >
                   Delete
                 </button>
@@ -111,22 +99,6 @@ const BeneficiariesPage = () => {}
           ))}
         </div>
       )}
-
-      {/* Add Beneficiary Button */}
-      {beneficiaries?.length > 0 && (
-        <Link
-          to="/beneficiaries/add"
-          className="block w-full text-center py-2.5 px-4 bg-gray-100 text-gray-700 font-medium rounded-md hover:bg-gray-200 border border-gray-300 transition-colors"
-        >
-          + Add Beneficiary
-        </Link>
-      )}
     </div>
   );
-
-
-export default BeneficiariesPage;
-  
-     
-            
-
+}
