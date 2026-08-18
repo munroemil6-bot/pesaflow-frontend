@@ -2,15 +2,7 @@ import { useEffect } from 'react'
 
 const cn = (...classes) => classes.filter(Boolean).join(' ')
 
-export default function Modal({
-  isOpen,
-  onClose,
-  title,
-  description,
-  children,
-  size = 'md',
-  className = '',
-}) {
+export default function Modal({isOpen, onClose, title, description, children, size = 'md', className = ''}) {
   useEffect(() => {
     if (!isOpen) return undefined
 

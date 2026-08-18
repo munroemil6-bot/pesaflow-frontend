@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom'
 
 const menuItems = [
-  { label: 'Dashboard', to: '/dashboard', icon: '🏠' },
-  { label: 'Wallet', to: '/wallet', icon: '💰' },
-  { label: 'Transfer', to: '/transfer/send', icon: '💸' },
-  { label: 'Beneficiaries', to: '/beneficiaries', icon: '👥' },
-  { label: 'Transactions', to: '/transactions', icon: '📊' },
-  { label: 'Profile', to: '/profile', icon: '👤' },
+  { label: 'Dashboard', to: '/dashboard' },
+  { label: 'Wallet', to: '/wallet' },
+  { label: 'Transfer', to: '/transfer/send' },
+  { label: 'Beneficiaries', to: '/beneficiaries' },
+  { label: 'Transactions', to: '/transactions' },
+  { label: 'Profile', to: '/profile' },
 ]
 
 export default function Sidebar() {
