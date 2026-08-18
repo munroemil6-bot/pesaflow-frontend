@@ -132,27 +132,27 @@ export default function Register() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-cyan-900 px-4 py-8 sm:px-6 sm:py-12">
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-emerald-950 to-green-800 px-4 py-8 sm:px-6 sm:py-12">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl items-center justify-center">
         <section className="grid w-full overflow-hidden rounded-3xl bg-white shadow-2xl shadow-slate-950/40 lg:grid-cols-[.9fr_1.1fr]">
-          <aside className="hidden bg-gradient-to-br from-blue-600 to-cyan-500 p-10 text-white lg:flex lg:flex-col lg:justify-between">
-            <Link to="/" className="inline-flex w-fit items-center gap-2 text-xl font-bold tracking-tight"><span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-blue-600">P</span>PesaFlow</Link>
-            <div><p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-100">Money that moves with you</p><h1 className="mt-4 text-4xl font-bold leading-tight">A simpler way to handle every transfer.</h1><p className="mt-5 max-w-sm text-blue-50">Build your wallet, manage beneficiaries, and stay in control of every shilling.</p></div>
-            <p className="text-sm text-blue-100">Set up in minutes. Transfer with confidence.</p>
+          <aside className="hidden bg-gradient-to-br from-emerald-600 to-green-500 p-10 text-white lg:flex lg:flex-col lg:justify-between">
+            <Link to="/" className="inline-flex w-fit items-center gap-2 text-xl font-bold tracking-tight"><span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-emerald-600">P</span>PesaFlow</Link>
+            <div><p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-100">Money that moves with you</p><h1 className="mt-4 text-4xl font-bold leading-tight">A simpler way to handle every transfer.</h1><p className="mt-5 max-w-sm text-emerald-50">Build your wallet, manage beneficiaries, and stay in control of every shilling.</p></div>
+            <p className="text-sm text-emerald-100">Set up in minutes. Transfer with confidence.</p>
           </aside>
           <div className="p-6 sm:p-10 lg:p-12">
-            <Link to="/" className="inline-flex items-center gap-2 text-lg font-bold text-blue-700 lg:hidden"><span className="grid h-8 w-8 place-items-center rounded-lg bg-blue-600 text-sm text-white">P</span>PesaFlow</Link>
-            <div className="mt-8 lg:mt-0"><p className="text-sm font-semibold text-blue-600">GET STARTED</p><h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">Create your account</h2><p className="mt-2 text-sm leading-6 text-slate-600">Join PesaFlow and start moving money with ease.</p></div>
+            <Link to="/" className="inline-flex items-center gap-2 text-lg font-bold text-emerald-700 lg:hidden"><span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-600 text-sm text-white">P</span>PesaFlow</Link>
+            <div className="mt-8 lg:mt-0"><p className="text-sm font-semibold text-emerald-600">GET STARTED</p><h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">Create your account</h2><p className="mt-2 text-sm leading-6 text-slate-600">Join PesaFlow and start moving money with ease.</p></div>
             {message && <div role="status" className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{message}</div>}
             <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
               <Input label="Full name" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="Jane Wanjiku" autoComplete="name" error={errors.fullName} />
-              <Input label="Email address" id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="jane@example.com" autoComplete="email" error={errors.email} />
+              <Input label="Email address" id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Enter your email address" autoComplete="email" error={errors.email} />
               <Input label="Phone number" id="phone" name="phone" type="tel" value={formData.phone} onChange={handleChange} placeholder="0712 345 678" autoComplete="tel" inputMode="tel" maxLength="10" error={errors.phone} />
-              <div><div className="relative"><Input label="Password" id="password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleChange} placeholder="Create a password" autoComplete="new-password" error={errors.password} className="pr-16" /><button type="button" onClick={() => setShowPassword((visible) => !visible)} className="absolute right-3 top-9 text-sm font-medium text-slate-500 hover:text-blue-600" aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? 'Hide' : 'Show'}</button></div><div className="mt-2" aria-live="polite"><div className="h-1.5 overflow-hidden rounded-full bg-slate-100"><div className={`h-full rounded-full transition-all ${strength.width} ${strength.color}`} /></div><p className="mt-1 text-xs text-slate-500">Password strength: <span className="font-semibold text-slate-700">{strength.label}</span>{formData.password && ` — ${strength.hint}`}</p></div></div>
+              <div><div className="relative"><Input label="Password" id="password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleChange} placeholder="Create a password" autoComplete="new-password" error={errors.password} className="pr-16" /><button type="button" onClick={() => setShowPassword((visible) => !visible)} className="absolute right-3 top-9 text-sm font-medium text-slate-500 hover:text-emerald-600" aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? 'Hide' : 'Show'}</button></div><div className="mt-2" aria-live="polite"><div className="h-1.5 overflow-hidden rounded-full bg-slate-100"><div className={`h-full rounded-full transition-all ${strength.width} ${strength.color}`} /></div><p className="mt-1 text-xs text-slate-500">Password strength: <span className="font-semibold text-slate-700">{strength.label}</span>{formData.password && ` — ${strength.hint}`}</p></div></div>
               <Input label="Confirm password" id="confirmPassword" name="confirmPassword" type={showPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={handleChange} placeholder="Re-enter your password" autoComplete="new-password" error={errors.confirmPassword} />
-              <Button type="submit" fullWidth size="lg" disabled={isLoading}>{isLoading ? 'Creating account…' : 'Create account'}</Button>
+              <Button type="submit" fullWidth size="lg" disabled={isLoading} className="bg-emerald-600 shadow-emerald-600/30 hover:bg-emerald-700 focus:ring-emerald-500/40">{isLoading ? 'Creating account…' : 'Create account'}</Button>
             </form>
-            <p className="mt-6 text-center text-sm text-slate-600">Already have an account? <Link to="/auth/login" className="font-semibold text-blue-600 hover:text-blue-700 hover:underline">Log in</Link></p>
+            <p className="mt-6 text-center text-sm text-slate-600">Already have an account? <Link to="/auth/login" className="font-semibold text-emerald-600 hover:text-emerald-700 hover:underline">Log in</Link></p>
           </div>
         </section>
       </div>
