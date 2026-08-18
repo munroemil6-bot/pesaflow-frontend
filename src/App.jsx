@@ -24,6 +24,7 @@ const SendMoney = React.lazy(() => import('./pages/Transfer/SendMoney'))
 const ConfirmTransfer = React.lazy(() => import('./pages/Transfer/ConfirmTransfer'))
 const TrasferStatus = React.lazy(() => import('./pages/Transfer/TrasferStatus'))
 const Profile = React.lazy(() => import('./pages/Landing/Profile'))
+const AdminTransactions = React.lazy(() => import('./pages/Dashboards/Transactions'))
 
 // TODO: Import layout components when created
 
@@ -60,6 +61,10 @@ function AppContent() {
               <Route 
                 path="/dashboard" 
                 element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/admin/transactions" 
+                element={<ProtectedRoute><AdminTransactions /></ProtectedRoute>} 
               />
               <Route 
                 path="/wallet" 
