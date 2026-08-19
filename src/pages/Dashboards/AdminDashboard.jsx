@@ -1,379 +1,72 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
+import { Link, Navigate } from 'react-router-dom'
+
+const formatCurrency = (amount) => new Intl.NumberFormat('en-KE', {
+  style: 'currency',
+  currency: 'KES',
+  maximumFractionDigits: 0,
+}).format(Number(amount) || 0)
+
+const formatDate = (value) => {
+  if (!value) return 'Just now'
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? 'Recently' : new Intl.DateTimeFormat('en-KE', { dateStyle: 'medium' }).format(date)
+}
 
 export default function AdminDashboard() {
-  const navigate = useNavigate()
+  const user = useSelector((state) => state.auth.user)
+  const isAuthLoading = useSelector((state) => state.auth.isLoading)
+  const transactions = useSelector((state) => state.transactions.list)
+  const isTransactionLoading = useSelector((state) => state.transactions.isLoading)
 
-  // Get logged-in user from the current session
-  const user = JSON.parse(localStorage.getItem('pesaflow_session'))?.user
+  const metrics = useMemo(() => {
+    const totalVolume = transactions.reduce((sum, transaction) => sum + (Number(transaction.amount) || 0), 0)
+    const revenue = transactions.reduce((sum, transaction) => sum + (Number(transaction.fee ?? transaction.transactionFee) || 0), 0)
+    return { totalUsers: user ? 1 : 0, totalTransactions: transactions.length, totalVolume, revenue }
+  }, [transactions, user])
 
-  const [metrics, setMetrics] = useState({
-    totalUsers: 0,
-    totalTx: 0,
-    totalVolume: 0,
-    revenue: 0,
-  })
+  const recentTransactions = useMemo(() => transactions.slice(0, 5), [transactions])
+  const recentUsers = user ? [user] : []
+  const isLoading = isAuthLoading || isTransactionLoading
 
-  const [recentTransactions, setRecentTransactions] = useState([])
-  const [recentUsers, setRecentUsers] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  // Check if current user is admin
-useEffect(() => {
-  if (!user || user.role !== 'admin') {
-    navigate('/dashboard')
-  }
-}, [user, navigate])
+  if (!isAuthLoading && !user) return <Navigate to="/auth/login" replace />
+  if (user?.role !== 'admin') return <Navigate to="/dashboard" replace />
 
-  // Mock dashboard data
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      setIsLoading(true)
-
-      // Simulate API loading
-      setTimeout(() => {
-        setMetrics({
-          totalUsers: 1250,
-          totalTx: 3480,
-          totalVolume: 12500000,
-          revenue: 285000,
-        })
-
-        setRecentTransactions([
-          {
-            id: 'TX001',
-            sender: 'Myles',
-            receiver: 'Nasra',
-            amount: 5000,
-            status: 'Completed',
-            date: '2026-08-18',
-          },
-          {
-            id: 'TX002',
-            sender: 'Mason',
-            receiver: 'Naomi',
-            amount: 2500,
-            status: 'Completed',
-            date: '2026-08-18',
-          },
-          {
-            id: 'TX003',
-            sender: 'Nasra',
-            receiver: 'Myles',
-            amount: 10000,
-            status: 'Pending',
-            date: '2026-08-17',
-          },
-          {
-            id: 'TX004',
-            sender: 'Naomi',
-            receiver: 'Mason',
-            amount: 3500,
-            status: 'Completed',
-            date: '2026-08-17',
-          },
-          {
-            id: 'TX005',
-            sender: 'Myles',
-            receiver: 'Naomi',
-            amount: 7500,
-            status: 'Failed',
-            date: '2026-08-16',
-          },
-        ])
-
-        setRecentUsers([
-          {
-            id: 1,
-            name: 'Myles Munroe',
-            email: 'myles@pesaflow.com',
-            status: 'Active',
-          },
-          {
-            id: 2,
-            name: 'Mason',
-            email: 'mason@pesaflow.com',
-            status: 'Active',
-          },
-          {
-            id: 3,
-            name: 'Nasra Hassan',
-            email: 'nasra@pesaflow.com',
-            status: 'Active',
-          },
-          {
-            id: 4,
-            name: 'Naomi Nafula',
-            email: 'naomi@pesaflow.com',
-            status: 'Inactive',
-          },
-        ])
-
-        setIsLoading(false)
-      }, 800)
-    }
-
-    fetchDashboardData()
-  }, [])
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-        <div className="flex min-h-[400px] items-center justify-center">
-          <div className="text-center">
-            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-green-600"></div>
-            <p className="text-gray-600">Loading admin dashboard...</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const cards = [
+    { label: 'Total users', value: metrics.totalUsers.toLocaleString('en-KE'), hint: 'Registered accounts', tone: 'bg-blue-50 text-blue-700' },
+    { label: 'Transactions', value: metrics.totalTransactions.toLocaleString('en-KE'), hint: 'Recorded transfers', tone: 'bg-violet-50 text-violet-700' },
+    { label: 'Transfer volume', value: formatCurrency(metrics.totalVolume), hint: 'Across all transfers', tone: 'bg-emerald-50 text-emerald-700' },
+    { label: 'Revenue', value: formatCurrency(metrics.revenue), hint: 'Fees collected', tone: 'bg-amber-50 text-amber-700' },
+  ]
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      {/* =========================
-          HEADER
-      ========================== */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-          Admin Dashboard
-        </h1>
+    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <header className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-sm font-semibold text-emerald-600">ADMIN WORKSPACE</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Admin dashboard</h1><p className="mt-2 text-sm text-slate-600">Monitor platform activity, transfers, and account growth.</p></div><Link to="/admin/analytics" className="rounded-xl border border-emerald-200 bg-white px-4 py-2.5 text-sm font-semibold text-emerald-700 shadow-sm hover:bg-emerald-50">View analytics</Link></header>
 
-        <p className="mt-1 text-sm text-gray-600">
-          Overview of your PesaFlow platform
-        </p>
+      <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Platform metrics">
+        {cards.map((card) => <article key={card.label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><span className={`inline-flex rounded-lg px-2.5 py-1 text-xs font-bold ${card.tone}`}>{card.label}</span><p className="mt-4 text-2xl font-bold tracking-tight text-slate-900">{isLoading ? '—' : card.value}</p><p className="mt-1 text-sm text-slate-500">{card.hint}</p></article>)}
+      </section>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-[1.5fr_1fr]">
+        <section className="rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="flex items-center justify-between border-b border-slate-100 px-5 py-4"><div><h2 className="font-bold text-slate-900">Recent transactions</h2><p className="mt-1 text-sm text-slate-500">Latest transfer activity across the platform.</p></div><Link to="/transactions" className="text-sm font-semibold text-emerald-700 hover:text-emerald-800 hover:underline">View all</Link></div>{isLoading ? <LoadingRows count={4} /> : recentTransactions.length === 0 ? <EmptyState title="No transactions yet" detail="Transactions will appear here as customers begin transferring money." /> : <ul className="divide-y divide-slate-100">{recentTransactions.map((transaction, index) => <li key={transaction.id || `${transaction.reference || 'transaction'}-${index}`} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4"><div><p className="font-semibold text-slate-900">{transaction.recipient || transaction.beneficiaryName || transaction.description || 'Money transfer'}</p><p className="mt-1 text-sm text-slate-500">{formatDate(transaction.createdAt || transaction.date)} · {transaction.status || 'Completed'}</p></div><p className="font-bold text-slate-900">{formatCurrency(transaction.amount)}</p></li>)}</ul>}</section>
+
+        <section className="rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="border-b border-slate-100 px-5 py-4"><h2 className="font-bold text-slate-900">Recent users</h2><p className="mt-1 text-sm text-slate-500">Latest registered account activity.</p></div>{isLoading ? <LoadingRows count={2} /> : recentUsers.length === 0 ? <EmptyState title="No users yet" detail="New user accounts will appear here." /> : <ul className="divide-y divide-slate-100">{recentUsers.map((recentUser) => <li key={recentUser.id} className="flex items-center gap-3 px-5 py-4"><span className="grid h-10 w-10 place-items-center rounded-full bg-emerald-100 font-bold text-emerald-700">{(recentUser.fullName || 'P').charAt(0).toUpperCase()}</span><div className="min-w-0"><p className="truncate font-semibold text-slate-900">{recentUser.fullName || 'PesaFlow user'}</p><p className="truncate text-sm text-slate-500">{recentUser.email || recentUser.phone || 'Account created'}</p></div></li>)}</ul>}<div className="border-t border-slate-100 p-4"><Link to="/admin/users" className="block rounded-xl bg-slate-900 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-slate-800">Manage users</Link></div></section>
       </div>
 
-      {/* =========================
-          KEY METRICS
-      ========================== */}
-      <section className="mb-8">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          
-          {/* Total Users */}
-          <div className="rounded-xl bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-500">
-              Total Users
-            </p>
-
-            <h2 className="mt-2 text-2xl font-bold text-gray-900">
-              {metrics.totalUsers.toLocaleString()}
-            </h2>
-
-            <p className="mt-2 text-sm text-green-600">
-              Registered users
-            </p>
-          </div>
-
-          {/* Total Transactions */}
-          <div className="rounded-xl bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-500">
-              Total Transactions
-            </p>
-
-            <h2 className="mt-2 text-2xl font-bold text-gray-900">
-              {metrics.totalTx.toLocaleString()}
-            </h2>
-
-            <p className="mt-2 text-sm text-green-600">
-              All transactions
-            </p>
-          </div>
-
-          {/* Total Volume */}
-          <div className="rounded-xl bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-500">
-              Total Volume
-            </p>
-
-            <h2 className="mt-2 text-2xl font-bold text-gray-900">
-              KES {metrics.totalVolume.toLocaleString()}
-            </h2>
-
-            <p className="mt-2 text-sm text-green-600">
-              Money transferred
-            </p>
-          </div>
-
-          {/* Revenue */}
-          <div className="rounded-xl bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-500">
-              Revenue
-            </p>
-
-            <h2 className="mt-2 text-2xl font-bold text-gray-900">
-              KES {metrics.revenue.toLocaleString()}
-            </h2>
-
-            <p className="mt-2 text-sm text-green-600">
-              Total fees
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* =========================
-          RECENT ACTIVITY
-      ========================== */}
-      <section className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-
-        {/* Recent Transactions */}
-        <div className="rounded-xl bg-white shadow-sm">
-          <div className="border-b border-gray-200 p-5">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Recent Transactions
-            </h2>
-
-            <p className="mt-1 text-sm text-gray-500">
-              Latest transactions on the platform
-            </p>
-          </div>
-
-          <div className="divide-y divide-gray-100">
-            {recentTransactions.map((transaction) => (
-              <div
-                key={transaction.id}
-                className="p-5 transition hover:bg-gray-50"
-              >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-
-                  <div>
-                    <p className="font-medium text-gray-900">
-                      {transaction.sender} → {transaction.receiver}
-                    </p>
-
-                    <p className="mt-1 text-xs text-gray-500">
-                      {transaction.id} • {transaction.date}
-                    </p>
-                  </div>
-
-                  <div className="sm:text-right">
-                    <p className="font-semibold text-gray-900">
-                      KES {transaction.amount.toLocaleString()}
-                    </p>
-
-                    <span
-                      className={`mt-1 inline-block rounded-full px-2 py-1 text-xs font-medium ${
-                        transaction.status === 'Completed'
-                          ? 'bg-green-100 text-green-700'
-                          : transaction.status === 'Pending'
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : 'bg-red-100 text-red-700'
-                      }`}
-                    >
-                      {transaction.status}
-                    </span>
-                  </div>
-
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Recent Users */}
-        <div className="rounded-xl bg-white shadow-sm">
-          <div className="border-b border-gray-200 p-5">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Recent Users
-            </h2>
-
-            <p className="mt-1 text-sm text-gray-500">
-              Recently registered users
-            </p>
-          </div>
-
-          <div className="divide-y divide-gray-100">
-            {recentUsers.map((recentUser) => (
-              <div
-                key={recentUser.id}
-                className="flex items-center justify-between p-5"
-              >
-                <div>
-                  <p className="font-medium text-gray-900">
-                    {recentUser.name}
-                  </p>
-
-                  <p className="mt-1 text-sm text-gray-500">
-                    {recentUser.email}
-                  </p>
-                </div>
-
-                <span
-                  className={`rounded-full px-2 py-1 text-xs font-medium ${
-                    recentUser.status === 'Active'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-100 text-gray-600'
-                  }`}
-                >
-                  {recentUser.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* =========================
-          QUICK LINKS
-      ========================== */}
-      <section>
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Quick Links
-          </h2>
-
-          <p className="mt-1 text-sm text-gray-500">
-            Quickly access admin management pages
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-
-          {/* Users */}
-          <button
-            onClick={() => navigate('/admin/users')}
-            className="rounded-xl bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-          >
-            <h3 className="font-semibold text-gray-900">
-              View All Users
-            </h3>
-
-            <p className="mt-1 text-sm text-gray-500">
-              Manage registered users
-            </p>
-          </button>
-
-          {/* Transactions */}
-          <button
-            onClick={() => navigate('/admin/transactions')}
-            className="rounded-xl bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-          >
-            <h3 className="font-semibold text-gray-900">
-              View All Transactions
-            </h3>
-
-            <p className="mt-1 text-sm text-gray-500">
-              Review platform transactions
-            </p>
-          </button>
-
-          {/* Analytics */}
-          <button
-            onClick={() => navigate('/admin/analytics')}
-            className="rounded-xl bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-          >
-            <h3 className="font-semibold text-gray-900">
-              Analytics
-            </h3>
-
-            <p className="mt-1 text-sm text-gray-500">
-              View platform analytics
-            </p>
-          </button>
-
-        </div>
-      </section>
-    </div>
+      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h2 className="font-bold text-slate-900">Quick actions</h2><p className="mt-1 text-sm text-slate-600">Jump directly to the administrative tools you need.</p><div className="mt-5 grid gap-3 sm:grid-cols-3"><QuickLink to="/admin/users" title="Manage users" detail="Review customer accounts" /><QuickLink to="/transactions" title="Review transfers" detail="See all transaction records" /><QuickLink to="/admin/analytics" title="View analytics" detail="Explore platform trends" /></div></section>
+    </main>
   )
+}
+
+function QuickLink({ to, title, detail }) {
+  return <Link to={to} className="rounded-xl border border-slate-200 p-4 transition hover:border-emerald-300 hover:bg-emerald-50"><p className="font-semibold text-slate-900">{title}</p><p className="mt-1 text-sm text-slate-600">{detail}</p></Link>
+}
+
+function EmptyState({ title, detail }) {
+  return <div className="px-5 py-10 text-center"><p className="font-semibold text-slate-800">{title}</p><p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-slate-500">{detail}</p></div>
+}
+
+function LoadingRows({ count }) {
+  return <div className="space-y-4 p-5" aria-label="Loading dashboard data">{Array.from({ length: count }, (_, index) => <div key={index} className="animate-pulse"><div className="h-4 w-2/5 rounded bg-slate-200" /><div className="mt-2 h-3 w-1/4 rounded bg-slate-100" /></div>)}</div>
 }
