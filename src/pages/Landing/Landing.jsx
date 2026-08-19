@@ -41,25 +41,6 @@ export default function Landing() {
     },
   ];
 
-  const faqs = [
-    {
-      question: 'Is PesaFlow safe to use?',
-      answer: 'Yes. We use bank-level encryption and comply with all financial regulations to protect your money and data.',
-    },
-    {
-      question: 'How long do transfers take?',
-      answer: 'Most transfers complete instantly. Mobile wallet transfers take seconds, bank transfers 1-3 minutes.',
-    },
-    {
-      question: 'What are the transfer limits?',
-      answer: 'You can send up to KES 999,999 per transaction. Daily limits vary by account type.',
-    },
-    {
-      question: 'How much does it cost?',
-      answer: 'Fees are transparent and displayed before you confirm. Most transfers cost less than KES 50.',
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -214,37 +195,6 @@ export default function Landing() {
               Start Your Journey
             </Button>
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl">
-          <div className="text-center mb-12">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-green-600">
-              Questions?
-            </p>
-            <h2 className="mt-2 text-4xl font-bold text-slate-900 sm:text-5xl">
-              Frequently asked
-            </h2>
-          </div>
-
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details
-                key={idx}
-                className="group rounded-xl border border-slate-200 bg-white p-5 transition hover:border-green-200 hover:shadow-md hover:shadow-green-500/10"
-              >
-                <summary className="cursor-pointer font-semibold text-slate-900 flex items-center justify-between">
-                  {faq.question}
-                  <span className="transition group-open:rotate-180">▼</span>
-                </summary>
-                <p className="mt-4 text-slate-600 leading-relaxed">
-                  {faq.answer}
-                </p>
-              </details>
-            ))}
           </div>
         </div>
       </section>
