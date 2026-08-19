@@ -3,7 +3,9 @@ import './App.css'
 import React, { Suspense } from 'react'
 import Navbar from './Components/Navbar'
 import Sidebar from './Components/Sidebar'
+import AdminSidebar from './Components/AdminSidebar'
 import Loader from './Components/Loader'
+import { useSelector } from 'react-redux'
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 
 const Landing = React.lazy(() => import('./pages/Landing/Landing'))
@@ -30,22 +32,27 @@ const AdminTransactions = React.lazy(() => import('./pages/Dashboards/Transactio
 
 
 
-// Protected Route Component (TODO: implement after Redux is set up)
-function ProtectedRoute({ children }) {
-  // TODO: Check if user is authenticated from Redux
-  // For now, allow all routes
+function ProtectedRoute({ children, adminOnly = false }) {
+  const { isAuthenticated, user } = useSelector((state) => state.auth)
+
+  if (!isAuthenticated) return <Navigate to="/auth/login" replace />
+  if (adminOnly && user?.role !== 'admin') return <Navigate to="/dashboard" replace />
+
   return children
 }
 
 function AppContent() {
   const location = useLocation()
+  const user = useSelector((state) => state.auth.user)
   const isPublicPage = location.pathname === '/' || location.pathname.startsWith('/auth/') || location.pathname.startsWith('/login') || location.pathname.startsWith('/register')
+  const isAdminPage = location.pathname.startsWith('/admin/')
+  const showAdminSidebar = !isPublicPage && isAdminPage && user?.role === 'admin'
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {!isPublicPage && <Navbar />}
       <div className="flex flex-1">
-        {!isPublicPage && <Sidebar />}
+        {!isPublicPage && (showAdminSidebar ? <AdminSidebar /> : <Sidebar />)}
         <main className={isPublicPage ? 'w-full' : 'flex-1'}>
           <Suspense fallback={<Loader />}>
             <Routes>
@@ -64,7 +71,7 @@ function AppContent() {
               />
               <Route 
                 path="/admin/transactions" 
-                element={<ProtectedRoute><AdminTransactions /></ProtectedRoute>} 
+                element={<ProtectedRoute adminOnly><AdminTransactions /></ProtectedRoute>}
               />
               <Route 
                 path="/wallet" 
@@ -110,15 +117,15 @@ function AppContent() {
               {/* Admin Routes (Protected - Admin Only) */}
               <Route 
                 path="/admin/dashboard" 
-                element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} 
+                element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>}
               />
               <Route 
                 path="/admin/analytics" 
-                element={<ProtectedRoute><Analytics /></ProtectedRoute>} 
+                element={<ProtectedRoute adminOnly><Analytics /></ProtectedRoute>}
               />
               <Route 
                 path="/admin/users" 
-                element={<ProtectedRoute><Users /></ProtectedRoute>} 
+                element={<ProtectedRoute adminOnly><Users /></ProtectedRoute>}
               />
               
               {/* Redirect unknown routes to home */}

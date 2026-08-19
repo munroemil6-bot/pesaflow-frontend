@@ -46,7 +46,9 @@ const createUser = ({
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials) => {
-    const isAdmin = credentials.emailOrPhone === 'nasra@pesaflow.com'
+    const isAdmin =
+      credentials.emailOrPhone.trim().toLowerCase() === 'admin@gmail.com' &&
+      credentials.password === 'admin1234'
 
     const user = createUser({
       ...credentials,

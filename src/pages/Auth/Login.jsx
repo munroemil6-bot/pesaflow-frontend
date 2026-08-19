@@ -106,9 +106,10 @@ export default function Login() {
     if (Object.keys(nextErrors).length) return
     setIsLoading(true)
     try {
-      await dispatch(loginUser(formData)).unwrap()
+      const session = await dispatch(loginUser(formData)).unwrap()
+      const destination = session.user.role === 'admin' ? '/admin/dashboard' : '/dashboard'
       setMessage('Login successful. Taking you to your dashboard…')
-      window.setTimeout(() => navigate('/dashboard'), 650)
+      window.setTimeout(() => navigate(destination), 650)
     } catch (error) {
       setErrorMessage(error.message || 'We could not log you in. Please try again.')
     } finally {
