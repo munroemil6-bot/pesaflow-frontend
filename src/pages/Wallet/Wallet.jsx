@@ -1,4 +1,4 @@
-// Wallet.jsx
+// Wallet.jsx - CORRECT VERSION
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Wallet.css';
@@ -84,23 +84,6 @@ const Wallet = () => {
     });
   };
 
-  // Get status icon
-  const getStatusIcon = (type) => {
-    return type === 'sent' ? '😊' : '😞';
-  };
-
-  // Get status class
-  const getStatusClass = (type) => {
-    return `transaction-${type}`;
-  };
-
-  // Get amount display
-  const getAmountDisplay = (type, amount) => {
-    const symbol = type === 'sent' ? '-' : '+';
-    const color = type === 'sent' ? 'sent-amount' : 'received-amount';
-    return { symbol, color };
-  };
-
   // Loading state
   if (isLoading) {
     return (
@@ -171,37 +154,31 @@ const Wallet = () => {
           </div>
         ) : (
           <div className="transaction-list">
-            {filteredTransactions.map((transaction) => {
-              const { symbol, color } = getAmountDisplay(transaction.type, transaction.amount);
-              return (
-                <div 
-                  key={transaction.id} 
-                  className="transaction-item"
-                >
-                  <div className="transaction-left">
-                    <span className="transaction-icon">
-                      {getStatusIcon(transaction.type)}
-                    </span>
-                    <div className="transaction-info">
-                      <div className="transaction-recipient">
-                        {transaction.recipient}
-                      </div>
-                      <div className="transaction-date">
-                        {formatDate(transaction.date)}
-                      </div>
+            {filteredTransactions.map((transaction) => (
+              <div key={transaction.id} className="transaction-item">
+                <div className="transaction-left">
+                  <span className="transaction-icon">
+                    {transaction.type === 'sent' ? '😊' : '😞'}
+                  </span>
+                  <div className="transaction-info">
+                    <div className="transaction-recipient">
+                      {transaction.recipient}
                     </div>
-                  </div>
-                  <div className="transaction-right">
-                    <div className={`transaction-amount ${color}`}>
-                      {symbol} {formatCurrency(transaction.amount)}
-                    </div>
-                    <div className={`transaction-status ${getStatusClass(transaction.type)}`}>
-                      {transaction.type}
+                    <div className="transaction-date">
+                      {formatDate(transaction.date)}
                     </div>
                   </div>
                 </div>
-              );
-            })}
+                <div className="transaction-right">
+                  <div className={`transaction-amount ${transaction.type === 'sent' ? 'sent-amount' : 'received-amount'}`}>
+                    {transaction.type === 'sent' ? '-' : '+'} {formatCurrency(transaction.amount)}
+                  </div>
+                  <div className={`transaction-status transaction-${transaction.type}`}>
+                    {transaction.type}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -210,7 +187,6 @@ const Wallet = () => {
 };
 
 export default Wallet;
-
 
 /**
  * ========================================================
@@ -297,7 +273,7 @@ import React from 'react';
 // TODO: Import useState from react
 // TODO: Import useEffect from react
 
- {
+{
   // TODO: Set up useNavigate hook
   
   // TODO: Create state for filterType: 'all' | 'sent' | 'received'
