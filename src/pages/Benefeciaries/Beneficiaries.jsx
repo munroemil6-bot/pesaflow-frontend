@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const mockBeneficiaries = [
@@ -7,14 +7,34 @@ const mockBeneficiaries = [
   { id: 3, name: 'Peter Mwangi', phone: '0744 111 222', bank: 'Co-op Bank' },
 ];
 
+const STORAGE_KEY = 'pesaflow-beneficiaries';
+
+const getStoredBeneficiaries = () => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) return mockBeneficiaries;
+
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : mockBeneficiaries;
+  } catch (error) {
+    return mockBeneficiaries;
+  }
+};
+
 export default function BeneficiariesPage() {
   const navigate = useNavigate();
-  const [beneficiaries, setBeneficiaries] = useState(mockBeneficiaries);
+  const [beneficiaries, setBeneficiaries] = useState(getStoredBeneficiaries);
   const [isLoading] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(beneficiaries));
+  }, [beneficiaries]);
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to remove this beneficiary?')) {
-      setBeneficiaries((current) => current.filter((beneficiary) => beneficiary.id !== id));
+      const updated = beneficiaries.filter((beneficiary) => beneficiary.id !== id);
+      setBeneficiaries(updated);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     }
   };
 
@@ -30,14 +50,14 @@ export default function BeneficiariesPage() {
     <div className="mx-auto max-w-4xl p-4 sm:p-6">
       <div className="mb-6 flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-blue-600">People</p>
+          <p className="text-sm font-medium uppercase tracking-[0.2em] text-green-600">People</p>
           <h1 className="mt-1 text-3xl font-bold text-slate-900">
             Beneficiaries ({beneficiaries.length})
           </h1>
         </div>
         <Link
           to="/beneficiaries/add"
-          className="inline-flex items-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm shadow-blue-600/30 transition hover:bg-blue-700"
+          className="inline-flex items-center rounded-xl bg-green-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm shadow-green-600/30 transition hover:bg-green-700"
         >
           + Add Beneficiary
         </Link>
@@ -49,7 +69,7 @@ export default function BeneficiariesPage() {
           <p className="mt-2 text-sm text-slate-500">Add someone you send money to often.</p>
           <Link
             to="/beneficiaries/add"
-            className="mt-5 inline-flex rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+            className="mt-5 inline-flex rounded-xl bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700"
           >
             + Add Your First Beneficiary
           </Link>
@@ -62,7 +82,7 @@ export default function BeneficiariesPage() {
               className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-lg font-semibold text-blue-700">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 text-lg font-semibold text-green-700">
                   {beneficiary.name.charAt(0)}
                 </div>
                 <div>
@@ -76,7 +96,7 @@ export default function BeneficiariesPage() {
                 <button
                   type="button"
                   onClick={() => navigate(`/transfer/send?beneficiary_id=${beneficiary.id}`)}
-                  className="rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                  className="rounded-xl bg-green-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-green-700"
                 >
                   Send Money
                 </button>
