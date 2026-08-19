@@ -1,4 +1,4 @@
-// Wallet.jsx - CORRECT VERSION
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Wallet.css';
@@ -141,7 +141,6 @@ const Wallet = () => {
           </button>
         </div>
 
-        {/* Transaction List */}
         {filteredTransactions.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">📭</div>
