@@ -1,8 +1,6 @@
 
-import React, { useEffect } from 'react';
-import { createSlice, createAsyncThunk, configureStore } from '@reduxjs/toolkit';
-import { Provider, useDispatch, useSelector } from 'react-redux';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 
 const mockTransactions = [
@@ -14,71 +12,6 @@ const mockTransactions = [
   { id: '6', recipient: 'Sarah Njoki', type: 'sent', amount: 750, status: 'pending', date: '2024-01-10T08:30:00' },
   { id: '7', recipient: 'David Otieno', type: 'received', amount: 2500, status: 'failed', date: '2024-01-09T13:20:00' },
 ];
-
-
-export const fetchTransactions = createAsyncThunk(
-  'transactions/fetchTransactions',
-  async () => {
-    
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(mockTransactions);
-      }, 800);
-    });
-  }
-);
-
-const transactionSlice = createSlice({
-  name: 'transactions',
-  initialState: {
-    items: [],
-    status: 'idle', 
-    error: null,
-    filter: 'all', 
-  },
-  reducers: {
-    setFilter: (state, action) => {
-      state.filter = action.payload;
-    },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchTransactions.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchTransactions.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.items = action.payload;
-      })
-      .addCase(fetchTransactions.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
-      });
-  },
-});
-
-export const { setFilter } = transactionSlice.actions;
-
-// Selectors
-const selectAllTransactions = (state) => state.transactions.items;
-const selectFilter = (state) => state.transactions.filter;
-const selectStatus = (state) => state.transactions.status;
-
-const selectFilteredTransactions = (state) => {
-  const transactions = selectAllTransactions(state);
-  const filter = selectFilter(state);
-  
-  if (filter === 'all') return transactions;
-  return transactions.filter(t => t.status === filter);
-};
-
-
-const store = configureStore({
-  reducer: {
-    transactions: transactionSlice.reducer,
-  },
-});
-
 
 
 const TransactionItem = ({ transaction, onClick }) => {
@@ -93,10 +26,6 @@ const TransactionItem = ({ transaction, onClick }) => {
     }
   };
 
-  const getStatusClass = (status) => {
-    return `status-${status}`;
-  };
-
   const formatAmount = (type, amount) => {
     const symbol = type === 'sent' ? '-' : '+';
     const currency = 'KSh';
@@ -104,163 +33,69 @@ const TransactionItem = ({ transaction, onClick }) => {
   };
 
   return (
-    <div className="transaction-item" onClick={onClick}>
-      <div className="transaction-info">
-        <div className="transaction-recipient">
-          <span className="recipient-name">{recipient}</span>
-          <span className="transaction-date">{new Date(date).toLocaleDateString()}</span>
+    <Link
+      to={`/transactions/${transaction.id}`}
+      onClick={onClick}
+      className="block border-b border-slate-200 px-4 py-4 transition hover:bg-slate-50 last:border-b-0"
+    >
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="font-semibold text-slate-900">{recipient}</p>
+          <p className="mt-1 text-sm text-slate-500">{new Date(date).toLocaleDateString()}</p>
         </div>
-        <div className="transaction-details">
-          <span className={`transaction-amount ${type}`}>
+        <div className="text-right">
+          <p className={`font-semibold ${type === 'sent' ? 'text-slate-900' : 'text-emerald-600'}`}>
             {formatAmount(type, amount)}
-          </span>
-          <span className={`transaction-status ${getStatusClass(status)}`}>
+          </p>
+          <p className="mt-1 text-sm text-slate-500">
             {getStatusIcon(status)} {status}
-          </span>
+          </p>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
 
 
 const TransactionList = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const transactions = useSelector(selectFilteredTransactions);
-  const currentFilter = useSelector(selectFilter);
-  const status = useSelector(selectStatus);
-
-  useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchTransactions());
-    }
-  }, [status, dispatch]);
-
-  const handleFilterClick = (filter) => {
-    dispatch(setFilter(filter));
-  };
-
-  const handleTransactionClick = (id) => {
-    navigate(`/transactions/${id}`);
-  };
-
-  // Loading state
-  if (status === 'loading') {
-    return (
-      <div className="transaction-list">
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p>Loading transactions...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Filter buttons
+  const [currentFilter, setCurrentFilter] = useState('all');
   const filters = ['all', 'successful', 'pending', 'failed'];
+  const transactions = currentFilter === 'all'
+    ? mockTransactions
+    : mockTransactions.filter((transaction) => transaction.status === currentFilter);
   
   return (
-    <div className="transaction-list">
-      <div className="header">
-        <h1>Transactions</h1>
-        <span className="transaction-count">{transactions.length} transactions</span>
-      </div>
-
-      <div className="filters">
-        {filters.map((filter) => (
-          <button
-            key={filter}
-            className={`filter-btn ${currentFilter === filter ? 'active' : ''}`}
-            onClick={() => handleFilterClick(filter)}
-          >
-            {filter.charAt(0).toUpperCase() + filter.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      {/* Empty state */}
-      {status === 'succeeded' && transactions.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-icon">📭</div>
-          <p>No transactions found</p>
-          <p className="empty-subtext">Try changing your filter</p>
+    <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Transactions</h1>
+            <p className="mt-1 text-sm text-slate-500">Review your recent money transfers.</p>
+          </div>
+          <span className="text-sm text-slate-500">{transactions.length} transactions</span>
         </div>
-      ) : (
-        <div className="transaction-items">
-          {transactions.map((transaction) => (
-            <TransactionItem
-              key={transaction.id}
-              transaction={transaction}
-              onClick={() => handleTransactionClick(transaction.id)}
-            />
+
+        <div className="mb-5 flex flex-wrap gap-2">
+          {filters.map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${currentFilter === filter ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-100'}`}
+              onClick={() => setCurrentFilter(filter)}
+            >
+              {filter.charAt(0).toUpperCase() + filter.slice(1)}
+            </button>
           ))}
         </div>
-      )}
-    </div>
-  );
-};
 
-
-
-const TransactionDetail = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const transactions = useSelector(selectAllTransactions);
-  const transaction = transactions.find(t => t.id === id);
-
-  if (!transaction) {
-    return (
-      <div className="detail-container">
-        <div className="detail-card">
-          <p className="not-found">Transaction not found</p>
-          <button className="back-btn" onClick={() => navigate('/')}>
-            ← Back to list
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="detail-container">
-      <button className="back-btn" onClick={() => navigate('/')}>
-        ← Back
-      </button>
-      
-      <div className="detail-card">
-        <h2>Transaction Details</h2>
-        <div className="detail-item">
-          <span className="label">Recipient:</span>
-          <span className="value">{transaction.recipient}</span>
-        </div>
-        <div className="detail-item">
-          <span className="label">Type:</span>
-          <span className={`value type-${transaction.type}`}>
-            {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
-          </span>
-        </div>
-        <div className="detail-item">
-          <span className="label">Amount:</span>
-          <span className={`value amount-${transaction.type}`}>
-            {transaction.type === 'sent' ? '-' : '+'} KSh {transaction.amount.toLocaleString()}
-          </span>
-        </div>
-        <div className="detail-item">
-          <span className="label">Status:</span>
-          <span className={`value status-${transaction.status}`}>
-            {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
-          </span>
-        </div>
-        <div className="detail-item">
-          <span className="label">Date:</span>
-          <span className="value">{new Date(transaction.date).toLocaleString()}</span>
-        </div>
-        <div className="detail-item">
-          <span className="label">Transaction ID:</span>
-          <span className="value id">{transaction.id}</span>
-        </div>
+        <section className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+          {transactions.length > 0 ? transactions.map((transaction) => (
+            <TransactionItem key={transaction.id} transaction={transaction} />
+          )) : (
+            <div className="p-10 text-center text-slate-500">No transactions found.</div>
+          )}
+        </section>
       </div>
     </div>
   );
@@ -269,106 +104,7 @@ const TransactionDetail = () => {
 
 
 const TransactionApp = () => {
-  return (
-    <Provider store={store}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<TransactionList />} />
-          <Route path="/transactions/:id" element={<TransactionDetail />} />
-        </Routes>
-      </Router>
-    </Provider>
-  );
+  return <TransactionList />;
 };
-const styleSheet = document.createElement("style");
-styleSheet.textContent = styles;
-document.head.appendChild(styleSheet);
 
 export default TransactionApp;
-
-/**
- * ========================================================
- * TRANSACTIONS PAGE
- * ========================================================
- * 
- * Owner: NASRA (Transactions + Transfer)
- * Week 1: Day 3 (Main Application)
- * Status: COMMENTS ONLY - CODE PENDING
- * 
- * WIREFRAME:
- * ┌──────────────────────────────────────┐
- * │  Transactions                        │
- * │                                      │
- * │  Filters: [All] [Successful] [Pend]  │
- * │                                      │
- * │  Transaction List:                   │
- * │  John Kamau                          │
- * │  Sent    -KSh 500     Successful ✓   │
- * │                                      │
- * │  Mary Wanjiku                        │
- * │  Received +KSh 1k     Successful ✓   │
- * │                                      │
- * │  Peter Ochieng                       │
- * │  Sent    -KSh 2k      Pending ⏳     │
- * └──────────────────────────────────────┘
- * 
- * REQUIREMENTS TO BUILD:
- * ✅ Page header
- * ✅ Filter buttons: All, Successful, Pending, Failed
- * ✅ Transaction list
- * ✅ Each transaction clickable → /transactions/:id
- * ✅ Show: recipient, type, amount, status
- * ✅ Loading state
- * ✅ Empty state if no transactions
- * ✅ Pagination or infinite scroll (optional)
- * ✅ Responsive design
- * 
- * MOCK DATA:
- * Array of transactions with: id, recipient, type, amount, status, date
- * 
- * REDUX INTEGRATION:
- * - Get transactions from transactionSlice
- * - Fetch on mount
- * 
- * FILTER LOGIC:
- * - All: show all transactions
- * - Successful: status === 'successful'
- * - Pending: status === 'pending'
- * - Failed: status === 'failed'
- * 
- * NEXT WEEK TODO:
- * - Connect to transaction API
- * - Implement real-time updates
- * - Add export to CSV
- * - Add date range filtering
- * 
- * ========================================================
- */
-
-import React from 'react';
-// TODO: Import useNavigate from react-router-dom
-
-{
-  // TODO: Set up useNavigate hook
-  // TODO: Create state for filterStatus ('all'|'successful'|'pending'|'failed')
-  // TODO: Create state for isLoading
-  // TODO: Create state for transactions (mock data for Week 1)
-  // TODO: useEffect to fetch transactions on mount
-  
-  // TODO: Build filteredTransactions logic based on filterStatus
-  
-  // TODO: Build JSX:
-  // 1. Page header
-  // 2. Filter buttons (4 buttons in a row)
-  //    - Active: blue bg, white text
-  //    - Inactive: gray bg, gray text
-  // 3. Transaction list
-  //    - If loading: show loading message
-  //    - If has transactions: show list
-  //      - Each transaction is clickable → /transactions/{id}
-  //      - Show: emoji icon, recipient, type, amount, status
-  //      - Hover effect
-  //    - If no transactions: show empty state
-  
-  return <div>{/* NASRA: Build transactions list here */}</div>;
-}
