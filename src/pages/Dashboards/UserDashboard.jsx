@@ -3,7 +3,7 @@
  * USER DASHBOARD
  * ========================================================
  * 
- * Owner: MYLES (Group Leader - Main Dashboard)
+ * Owner: Nassra (Group Leader - Main Dashboard)
  * Week 1: Day 3 (Main Application)
  * Status: COMMENTS ONLY - CODE PENDING
  * 

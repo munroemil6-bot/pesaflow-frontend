@@ -1,105 +1,263 @@
-/**
- * ========================================================
- * TRANSACTION DETAILS PAGE
- * ========================================================
- * 
- * Owner: NASRA (Transactions + Transfer)
- * Week 1: Day 3 (Main Application)
- * Status: COMMENTS ONLY - CODE PENDING
- * 
- * WIREFRAME:
- * ┌────────────────────────────────────┐
- * │  Transaction Details               │
- * │                                    │
- * │  Transaction ID: TXN-123456        │
- * │                                    │
- * │  Recipient:      John Kamau        │
- * │  Phone:          0712 XXXX XXX     │
- * │                                    │
- * │  Amount:         KSh 1,000         │
- * │  Fee:            KSh 10            │
- * │  Total:          KSh 1,010         │
- * │                                    │
- * │  Status:         Successful ✓      │
- * │  Date:           17 August 2026    │
- * │                                    │
- * │  [ Download Receipt ]              │
- * │  [ Back ]                          │
- * └────────────────────────────────────┘
- * 
- * REQUIREMENTS TO BUILD:
- * ✅ Get transaction ID from URL params
- * ✅ Display transaction details
- * ✅ Show: ID, recipient, phone, amount, fee, total, status, date
- * ✅ Download Receipt button
- * ✅ Back button
- * ✅ Loading state while fetching
- * ✅ Error state if transaction not found
- * ✅ Responsive design
- * 
- * ROUTE PARAMS:
- * - /transactions/:id
- * - Extract transaction ID from URL params
- * 
- * DATA STRUCTURE:
- * {
- *   id: string,
- *   recipient: string,
- *   recipientPhone: string,
- *   amount: number,
- *   fee: number,
- *   status: string,
- *   date: string,
- *   type: string
- * }
- * 
- * FUNCTIONS TO BUILD:
- * - useParams: get transaction ID from URL
- * - useEffect: fetch transaction details
- * - handleDownloadReceipt: generate PDF or download receipt
- * - handleBack: navigate back to transactions list
- * 
- * NEXT WEEK TODO:
- * - Connect to transaction details API
- * - Implement receipt PDF generation
- * - Add share receipt via email/SMS
- * - Add retry failed transaction button
- * 
- * ========================================================
- */
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
-import React from 'react';
-// TODO: Import useParams from react-router-dom
-// TODO: Import useNavigate from react-router-dom
+function TransactionDetails() {
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-export default function TransactionDetails() {
-  // TODO: Set up useParams hook to get transaction ID from URL
-  // TODO: Set up useNavigate hook
-  // TODO: Create state for transaction data
-  // TODO: Create state for isLoading
-  // TODO: Create state for error
-  // TODO: useEffect to fetch transaction details based on ID
+  const [transaction, setTransaction] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetchTransaction();
+  }, [id]);
+
+  const fetchTransaction = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      
+
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/transactions/${id}/`
+      );
+
+      if (!response.ok) {
+        throw new Error("Transaction not found");
+      }
+
+      const data = await response.json();
+
+      setTransaction(data);
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        "Transaction could not be found. Please check the transaction ID."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   
-  // TODO: Build handleDownloadReceipt() function
-  // - For Week 1: just log or show alert
-  // - Week 2: generate PDF receipt
+  const formatMoney = (amount) => {
+    return `KSh ${Number(amount).toLocaleString()}`;
+  };
+
   
-  // TODO: Build handleBack() function
-  // - navigate back to /transactions
+  const formatDate = (date) => {
+    if (!date) return "N/A";
+
+    return new Date(date).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
   
-  // TODO: Build JSX:
-  // 1. Header with back button
-  // 2. If loading: show loading message
-  // 3. If error: show error message with retry button
-  // 4. If has data: show all transaction details in organized layout
-  //    - Transaction ID
-  //    - Recipient info (name, phone)
-  //    - Amount breakdown (amount, fee, total)
-  //    - Status (with icon/badge)
-  //    - Date/Time
-  // 5. Action buttons:
-  //    - Download Receipt button
-  //    - Back button
-  
-  return <div>{/* NASRA: Build transaction details page here */}</div>;
+  const downloadReceipt = () => {
+    if (!transaction) return;
+
+    const receipt = `
+PESAFLOW
+TRANSACTION RECEIPT
+==============================
+
+Transaction ID:
+${transaction.transaction_id || id}
+
+Recipient:
+${transaction.recipient || transaction.recipient_name || "N/A"}
+
+Phone:
+${transaction.phone || transaction.recipient_phone || "N/A"}
+
+Amount:
+${formatMoney(transaction.amount)}
+
+Fee:
+${formatMoney(transaction.fee)}
+
+Total:
+${formatMoney(
+  transaction.total ||
+    Number(transaction.amount) + Number(transaction.fee)
+)}
+
+Status:
+${transaction.status || "Successful"}
+
+Date:
+${formatDate(transaction.date || transaction.created_at)}
+
+==============================
+Thank you for using PesaFlow.
+`;
+
+    const blob = new Blob([receipt], {
+      type: "text/plain",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `PesaFlow-Receipt-${transaction.transaction_id || id}.txt`;
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+        <div className="mx-auto flex min-h-[400px] max-w-2xl items-center justify-center rounded-xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-100 border-t-emerald-600"></div>
+          <h2>Loading transaction...</h2>
+          <p>Please wait while we fetch the transaction details.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+        <div className="mx-auto max-w-2xl rounded-xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200">
+          <div className="mx-auto grid h-8 w-8 place-items-center rounded-full bg-red-100 font-bold text-red-700">!</div>
+          <h2>Transaction Not Found</h2>
+          <p>{error}</p>
+          <button className="mt-5 rounded-lg bg-slate-200 px-4 py-2 font-semibold text-slate-700" onClick={() => navigate(-1)}>
+            Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto max-w-2xl rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-5">
+          <h1 className="text-2xl font-bold text-slate-900">Transaction Details</h1>
+          <span className="font-semibold text-emerald-600">
+            ✓ {transaction.status || "Successful"}
+          </span>
+        </div>
+
+        <div className="mt-6 flex items-center justify-between gap-4 rounded-lg bg-slate-100 p-4">
+          <span className="text-slate-500">Transaction ID</span>
+          <strong className="text-right text-slate-900">{transaction.transaction_id || id}</strong>
+        </div>
+
+        <div className="mt-6 grid gap-4">
+
+          {/* Recipient */}
+          <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-4">
+            <span className="text-slate-500">Recipient</span>
+
+            <strong className="text-right text-slate-900">
+              {transaction.recipient ||
+                transaction.recipient_name ||
+                "N/A"}
+            </strong>
+          </div>
+
+          {/* Phone */}
+          <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-4">
+            <span className="text-slate-500">Phone</span>
+
+            <strong className="text-right text-slate-900">
+              {transaction.phone ||
+                transaction.recipient_phone ||
+                "N/A"}
+            </strong>
+          </div>
+
+          {/* Amount */}
+          <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-4">
+            <span className="text-slate-500">Amount</span>
+
+            <strong className="text-right text-slate-900">
+              {formatMoney(transaction.amount)}
+            </strong>
+          </div>
+
+          {/* Fee */}
+          <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-4">
+            <span className="text-slate-500">Fee</span>
+
+            <strong className="text-right text-slate-900">
+              {formatMoney(transaction.fee)}
+            </strong>
+          </div>
+
+          {/* Total */}
+          <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-4 text-lg">
+            <span className="text-slate-500">Total</span>
+
+            <strong className="text-right text-slate-900">
+              {formatMoney(
+                transaction.total ||
+                  Number(transaction.amount) +
+                    Number(transaction.fee)
+              )}
+            </strong>
+          </div>
+
+          {/* Status */}
+          <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-4">
+            <span className="text-slate-500">Status</span>
+
+            <strong className="text-right font-semibold text-emerald-600">
+              ✓ {transaction.status || "Successful"}
+            </strong>
+          </div>
+
+          {/* Date */}
+          <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-4">
+            <span className="text-slate-500">Date</span>
+
+            <strong className="text-right text-slate-900">
+              {formatDate(
+                transaction.date ||
+                  transaction.created_at
+              )}
+            </strong>
+          </div>
+
+        </div>
+
+        {/* Buttons */}
+        <div className="mt-8 flex flex-wrap gap-3">
+
+          <button
+            className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-700"
+            onClick={downloadReceipt}
+          >
+            ↓ Download Receipt
+          </button>
+
+          <button
+            className="rounded-lg bg-slate-200 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-300"
+            onClick={() => navigate(-1)}
+          >
+            Back
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+  );
 }
+
+export default TransactionDetails;
+
