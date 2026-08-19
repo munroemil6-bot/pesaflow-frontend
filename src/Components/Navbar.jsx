@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 export default function Navbar() {
-  // TODO: Get user name from Redux/auth context
-  const userName = localStorage.getItem('userName') || 'User'
+  const user = useSelector((state) => state.auth.user)
+  const userName = user?.role === 'admin'
+    ? 'Admin'
+    : user?.fullName || user?.email || 'User'
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-xl">
@@ -20,7 +23,7 @@ export default function Navbar() {
 
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <p className="text-sm font-medium text-slate-900">Welcome back</p>
+            <p className="text-sm font-medium text-slate-900">Welcome back, {userName}</p>
             <p className="text-lg font-bold text-green-600">{userName}</p>
           </div>
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
