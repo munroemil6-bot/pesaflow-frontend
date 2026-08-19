@@ -289,11 +289,6 @@ export default ConfirmTransfer;
  * ========================================================
  */
 
-import React from 'react';
-// TODO: Import useNavigate from react-router-dom
-// TODO: Import useSelector from react-redux
-
- {
   // TODO: Set up useNavigate hook
   // TODO: Get transfer data from Redux (useSelector from transfer slice)
   
@@ -325,4 +320,6 @@ import React from 'react';
   //    - "Back" (secondary, disabled if loading)
   
   return <div>{/* NASRA: Build confirm transfer page here */}</div>;
-}
+
+
+
