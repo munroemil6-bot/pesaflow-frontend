@@ -29,6 +29,8 @@ const KEY_TRANSACTION_TARGETS = {
   'demo-naomi': 49,
 }
 
+const isSeededCustomer = (user) => user.role !== 'admin' && (user.id.startsWith('demo-') || user.id.startsWith('support-'))
+
 const daysAgo = (days) => {
   const date = new Date()
   date.setDate(date.getDate() - days)
@@ -175,7 +177,7 @@ const normaliseKeyTransactions = (database) => {
 const seedTransactionHistory = (database) => {
   let changed = false
   const keyUserIds = new Set(DEMO_USERS.map((user) => user.id))
-  const customerUsers = database.users.filter((user) => user.role !== 'admin')
+  const customerUsers = database.users.filter(isSeededCustomer)
 
   customerUsers.forEach((user, userIndex) => {
     const currentTransactions = database.transactions.filter((transaction) => transaction.ownerId === user.id)
@@ -233,7 +235,7 @@ const normaliseSupportTransactions = (database) => {
 
 const normaliseTrendDates = (database) => {
   let changed = false
-  const customerUsers = database.users.filter((user) => user.role !== 'admin')
+  const customerUsers = database.users.filter(isSeededCustomer)
 
   customerUsers.forEach((user, userIndex) => {
     database.transactions
@@ -251,6 +253,16 @@ const normaliseTrendDates = (database) => {
   })
 
   return changed
+}
+
+const clearAccidentalNewUserHistory = (database) => {
+  const seededIds = new Set(database.users.filter(isSeededCustomer).map((user) => user.id))
+  const originalLength = database.transactions.length
+  database.transactions = database.transactions.filter((transaction) => {
+    const isSyntheticSeed = transaction.id?.includes('-transaction-')
+    return !isSyntheticSeed || seededIds.has(transaction.ownerId)
+  })
+  return database.transactions.length !== originalLength
 }
 
 const seedSupportUsers = (database) => {
@@ -333,6 +345,7 @@ export const readDatabase = () => {
       seedSupportUsers(database)
       seedTransactionHistory(database)
       normaliseTrendDates(database)
+      clearAccidentalNewUserHistory(database)
       window.localStorage.setItem(DATABASE_KEY, JSON.stringify(database))
       return database
     }
@@ -352,6 +365,7 @@ export const readDatabase = () => {
     changed = seedTransactionHistory(database) || changed
     changed = normaliseSupportTransactions(database) || changed
     changed = normaliseTrendDates(database) || changed
+    changed = clearAccidentalNewUserHistory(database) || changed
     if (changed) saveDatabase(database)
     return database
   } catch {
