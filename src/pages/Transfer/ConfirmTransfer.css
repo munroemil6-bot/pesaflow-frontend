@@ -1,65 +1,54 @@
 /* Confirm Transfer Page Styles */
-
-.confirm-transfer-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 1.5rem;
+:root{
+  --brand-500: #10b981;
+  --brand-600: #059669;
+  --brand-700: #047857;
+  --muted: #6b7280;
+  --card-border: #e6f4ec;
 }
 
-.transfer-summary-card {
-  background: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+.confirm-container{
+  max-width:720px;
+  margin:0 auto;
+  padding:1.25rem;
 }
 
-.transfer-summary-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #e5e7eb;
-}
+.confirm-header{ display:flex; flex-direction:column; gap:0.25rem }
+.confirm-header h1{ margin:0; font-size:1.6rem }
+.confirm-description{ color:var(--muted); margin:0 }
 
-.transfer-summary-row:last-child {
-  border-bottom: none;
-}
+.transfer-summary{ background:#fff; border:1px solid var(--card-border); border-radius:0.9rem; padding:1rem; margin-top:1rem; box-shadow:0 10px 30px rgba(2,6,23,0.04) }
 
-.transfer-summary-label {
-  font-weight: 500;
-  color: #6b7280;
-}
+.summary-section{ display:flex; flex-direction:column; gap:0.35rem; padding:0.5rem 0 }
+.summary-label{ font-size:0.85rem; color:var(--muted); font-weight:600 }
+.recipient-info{ display:flex; flex-direction:column; gap:0.15rem }
+.recipient-name{ font-weight:800; font-size:1.05rem }
+.recipient-phone{ color:#475569 }
 
-.transfer-summary-value {
-  font-weight: 600;
-  color: #1f2937;
-}
+.summary-divider{ height:1px; background:var(--card-border); margin:0.5rem 0 }
 
-.error-message {
-  background-color: #fee2e2;
-  color: #991b1b;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  margin-bottom: 1rem;
-}
+.summary-details{ display:flex; flex-direction:column; gap:0.5rem }
+.detail-row{ display:flex; justify-content:space-between; align-items:center }
+.detail-label{ color:var(--muted) }
+.detail-value{ font-weight:700 }
+.detail-value.amount{ font-size:1.15rem }
+.detail-row.total .detail-value.total-amount{ font-size:1.15rem }
 
-.button-group {
-  display: flex;
-  gap: 1rem;
-}
+.description-text{ color:#334155 }
+.transaction-id{ font-weight:700; color:#0f172a }
 
-.button-group button {
-  flex: 1;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+.error-message{ background:#fee2e2; color:#991b1b; padding:0.65rem; border-radius:0.6rem; display:flex; gap:0.5rem; align-items:center }
 
-.button-group button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.action-buttons{ display:flex; gap:0.75rem; margin-top:1rem }
+.cancel-btn{ flex:1; padding:0.85rem; border-radius:0.7rem; background:#ffffff; border:1px solid #cbd5e1; cursor:pointer }
+.confirm-btn{ flex:2; padding:0.85rem; border-radius:0.7rem; background:linear-gradient(135deg,var(--brand-500),var(--brand-600)); color:white; font-weight:800; border:none; cursor:pointer }
+.confirm-btn:disabled, .cancel-btn:disabled{ opacity:0.7; cursor:not-allowed }
+
+.loading-overlay{ position:fixed; inset:0; background:rgba(2,6,23,0.35); display:flex; align-items:center; justify-content:center }
+.loading-content{ background:white; padding:1.25rem 1.5rem; border-radius:0.75rem; text-align:center }
+.spinner-large{ width:56px; height:56px; border:5px solid #e6f4ec; border-top-color:var(--brand-600); border-radius:50%; animation:spin 0.9s linear infinite; margin:0 auto 0.75rem }
+
+@media (max-width:640px){
+  .action-buttons{ flex-direction:column }
+  .confirm-btn{ width:100% }
 }
