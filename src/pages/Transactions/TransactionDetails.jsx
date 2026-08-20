@@ -1,17 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function TransactionDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const storedTransactions = useSelector((state) => state.transactions.list);
 
   const [transaction, setTransaction] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const storedTransaction = storedTransactions.find((item) => item.id === id);
+    if (storedTransaction) {
+      setTransaction(storedTransaction);
+      setLoading(false);
+      return;
+    }
     fetchTransaction();
-  }, [id]);
+  }, [id, storedTransactions]);
 
   const fetchTransaction = async () => {
     setLoading(true);

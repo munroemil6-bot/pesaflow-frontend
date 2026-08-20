@@ -1,4 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import {
+  ADMIN_EMAIL,
+  ADMIN_PASSWORD,
+  findUser,
+  registerMockUser,
+} from '../../data/mockData'
 
 const readSession = () => {
   if (typeof window === 'undefined') return null
@@ -17,46 +23,20 @@ const clearSession = () => {
   if (typeof window !== 'undefined') window.localStorage.removeItem('pesaflow_session')
 }
 
-const createUser = ({
-  fullName,
-  email,
-  phone,
-  emailOrPhone,
-  role = 'user',
-}) => ({
-  id: role === 'admin' ? 'demo-admin' : 'demo-user',
-
-  fullName:
-    fullName ||
-    (role === 'admin' ? 'PesaFlow Admin' : 'PesaFlow User'),
-
-  email:
-    email ||
-    (emailOrPhone?.includes('@') ? emailOrPhone : ''),
-
-  phone:
-    phone ||
-    (!emailOrPhone?.includes('@') ? emailOrPhone : ''),
-
-  role,
-
-  twoFactorEnabled: false,
-})
-
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials) => {
-    const isAdmin =
-      credentials.emailOrPhone.trim().toLowerCase() === 'admin@gmail.com' &&
-      credentials.password === 'admin1234'
+    const identifier = credentials.emailOrPhone.trim()
+    const isAdmin = identifier.toLowerCase() === ADMIN_EMAIL && credentials.password === ADMIN_PASSWORD
+    const user = isAdmin ? findUser(ADMIN_EMAIL) : findUser(identifier)
 
-    const user = createUser({
-      ...credentials,
-      role: isAdmin ? 'admin' : 'user',
-    })
+    if (!user || user.password !== credentials.password) {
+      throw new Error('Invalid email or password.')
+    }
 
+    const { password: _password, ...safeUser } = user
     const session = {
-      user,
+      user: safeUser,
       token: 'demo-token',
     }
 
@@ -67,8 +47,9 @@ export const loginUser = createAsyncThunk(
 )
 
 export const registerUser = createAsyncThunk('auth/registerUser', async (details) => {
-  const user = createUser(details)
-  const session = { user, token: 'demo-token' }
+  const user = registerMockUser(details)
+  const { password: _password, ...safeUser } = user
+  const session = { user: safeUser, token: 'demo-token' }
   saveSession(session)
   return session
 })

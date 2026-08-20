@@ -1,0 +1,554 @@
+
+.transfer-status-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+.status-header {
+  margin-bottom: 24px;
+}
+
+.status-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a2332;
+  margin: 0 0 4px 0;
+}
+
+.status-description {
+  color: #6c757d;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* ============================================
+   STATUS CARD
+   ============================================ */
+.status-card {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+}
+
+/* Status Icon */
+.status-icon-container {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.status-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid;
+  margin-bottom: 12px;
+}
+
+.icon-emoji {
+  font-size: 36px;
+}
+
+.status-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Status Details */
+.status-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row.total {
+  border-top: 2px solid #e9ecef;
+  border-bottom: 2px solid #e9ecef;
+  padding: 12px 0;
+  margin-top: 4px;
+}
+
+.detail-label {
+  font-size: 14px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 15px;
+  color: #1a2332;
+  font-weight: 500;
+}
+
+.detail-value.id {
+  font-family: monospace;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.detail-value.amount {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.detail-value.fee {
+  color: #6c757d;
+}
+
+.detail-value.total-amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a2332;
+}
+
+.detail-value.recipient {
+  font-weight: 600;
+}
+
+.detail-value.description {
+  color: #495057;
+  font-weight: 400;
+}
+
+.detail-value.date {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.detail-value.status-badge {
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 2px solid;
+}
+
+.detail-value.status-badge.successful {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #10b981;
+}
+
+.detail-value.status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #f59e0b;
+}
+
+.detail-value.status-badge.failed {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #ef4444;
+}
+
+/* ============================================
+   ACTION BUTTONS
+   ============================================ */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-btn {
+  padding: 14px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.download-btn {
+  background: #4a90e2;
+  color: white;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+}
+
+.download-btn:hover {
+  background: #3a7bc8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+}
+
+.dashboard-btn {
+  background: #6c757d;
+  color: white;
+}
+
+.dashboard-btn:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
+.send-again-btn {
+  background: #10b981;
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.send-again-btn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+/* ============================================
+   SUPPORT MESSAGE
+   ============================================ */
+.support-message {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.support-message.pending {
+  background: #fef3c7;
+  border-color: #fde68a;
+}
+
+.support-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.support-message p {
+  margin: 0;
+  font-size: 14px;
+  color: #1a2332;
+  line-height: 1.5;
+}
+
+.support-message.pending p {
+  color: #92400e;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 768px) {
+  .transfer-status-container {
+    padding: 16px;
+  }
+
+  .status-card {
+    padding: 24px;
+  }
+
+  .status-header h1 {
+    font-size: 24px;
+  }
+
+  .status-icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .icon-emoji {
+    font-size: 28px;
+  }
+
+  .status-title {
+    font-size: 20px;
+  }
+
+  .detail-value.amount {
+    font-size: 16px;
+  }
+
+  .detail-value.total-amount {
+    font-size: 18px;
+  }
+
+  .action-btn {
+    padding: 12px 20px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .transfer-status-container {
+    padding: 12px;
+  }
+
+  .status-card {
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  .status-header h1 {
+    font-size: 20px;
+  }
+
+  .status-description {
+    font-size: 14px;
+  }
+
+  .status-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .icon-emoji {
+    font-size: 24px;
+  }
+
+  .status-title {
+    font-size: 18px;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 6px 0;
+  }
+
+  .detail-row.total {
+    padding: 10px 0;
+  }
+
+  .detail-label {
+    font-size: 12px;
+  }
+
+  .detail-value {
+    font-size: 14px;
+  }
+
+  .detail-value.amount {
+    font-size: 16px;
+  }
+
+  .detail-value.total-amount {
+    font-size: 17px;
+  }
+
+  .detail-value.id {
+    font-size: 12px;
+  }
+
+  .detail-value.status-badge {
+    font-size: 12px;
+    padding: 2px 12px;
+  }
+
+  .action-btn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .support-message {
+    padding: 12px;
+  }
+
+  .support-message p {
+    font-size: 13px;
+  }
+
+  .status-details {
+    gap: 8px;
+  }
+}
+
+/* ============================================
+   DARK MODE SUPPORT
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  .transfer-status-container {
+    background: #1a1a2e;
+  }
+
+  .status-header h1 {
+    color: #e9ecef;
+  }
+
+  .status-description {
+    color: #adb5bd;
+  }
+
+  .status-card {
+    background: #16213e;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .status-title {
+    color: #e9ecef !important;
+  }
+
+  .detail-row {
+    border-bottom-color: #2a3a5e;
+  }
+
+  .detail-row.total {
+    border-top-color: #2a3a5e;
+    border-bottom-color: #2a3a5e;
+  }
+
+  .detail-label {
+    color: #adb5bd;
+  }
+
+  .detail-value {
+    color: #e9ecef;
+  }
+
+  .detail-value.id {
+    color: #adb5bd;
+  }
+
+  .detail-value.fee {
+    color: #adb5bd;
+  }
+
+  .detail-value.total-amount {
+    color: #e9ecef;
+  }
+
+  .detail-value.description {
+    color: #adb5bd;
+  }
+
+  .detail-value.date {
+    color: #adb5bd;
+  }
+
+  .dashboard-btn {
+    background: #2a3a5e;
+  }
+
+  .dashboard-btn:hover {
+    background: #3a4a6e;
+  }
+
+  .support-message {
+    background: #2c1a1a;
+    border-color: #3a2a2a;
+  }
+
+  .support-message.pending {
+    background: #2c2a1a;
+    border-color: #3a3a2a;
+  }
+
+  .support-message p {
+    color: #e9ecef;
+  }
+
+  .support-message.pending p {
+    color: #fde68a;
+  }
+
+  .status-details .status-badge.successful {
+    background: #1a3a2a;
+    color: #6ee7b7;
+    border-color: #10b981;
+  }
+
+  .status-details .status-badge.pending {
+    background: #3a3a1a;
+    color: #fcd34d;
+    border-color: #f59e0b;
+  }
+
+  .status-details .status-badge.failed {
+    background: #3a1a1a;
+    color: #fca5a5;
+    border-color: #ef4444;
+  }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.status-card {
+  animation: fadeInUp 0.5s ease;
+}
+
+.status-icon {
+  animation: fadeInUp 0.6s ease;
+}
+
+.status-title {
+  animation: fadeInUp 0.7s ease;
+}
+
+.status-details {
+  animation: fadeInUp 0.8s ease;
+}
+
+.action-buttons {
+  animation: fadeInUp 0.9s ease;
+}
+
+/* Status-specific pulse animations */
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+}
+
+@keyframes pulse-yellow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+}
+
+.status-icon-container .status-icon[style*="green"] {
+  animation: pulse-green 2s infinite;
+}
+
+.status-icon-container .status-icon[style*="orange"] {
+  animation: pulse-yellow 2s infinite;
+}
+
+.status-icon-container .status-icon[style*="red"] {
+  animation: pulse-red 2s infinite;
+}

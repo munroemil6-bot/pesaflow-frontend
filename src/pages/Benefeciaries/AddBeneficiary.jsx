@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { addBeneficiary } from '../../redux/slices/beneficiarySlice';
 import './AddBeneficiary.css';
-
-const STORAGE_KEY = 'pesaflow-beneficiaries';
 
 const AddBeneficiary = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const userId = useSelector((state) => state.auth.user?.id);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -93,9 +95,7 @@ const AddBeneficiary = () => {
         notes: formData.notes.trim(),
       };
 
-      const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      const updated = Array.isArray(existing) ? [...existing, newBeneficiary] : [newBeneficiary];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      dispatch(addBeneficiary({ ...newBeneficiary, userId }));
 
       setSuccess(true);
 

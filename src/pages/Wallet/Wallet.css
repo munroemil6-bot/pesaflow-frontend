@@ -29,3 +29,87 @@
     transform: rotate(360deg);
   }
 }
+
+/* Balance card */
+.balance-card {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 10px 25px rgba(6, 95, 70, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.balance-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.balance-label {
+  font-size: 0.85rem;
+  opacity: 0.95;
+}
+
+.balance-amount {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.add-funds-btn {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  padding: 0.6rem 0.95rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  cursor: pointer;
+}
+
+.add-funds-btn:hover { opacity: 0.95; transform: translateY(-1px); }
+
+/* Recent activity */
+.recent-activity { margin-top: 1.25rem; }
+.filter-buttons { display:flex; gap:0.5rem; margin:0.75rem 0 1rem 0 }
+.filter-btn { padding:0.45rem 0.75rem; border-radius:0.6rem; background:#f1f5f9; color:#0f172a; border:1px solid #e2e8f0; cursor:pointer }
+.filter-btn.active { background:#064e3b; color:white; border-color:#064e3b }
+
+.transaction-list { display:flex; flex-direction:column; gap:0.75rem }
+.transaction-item { display:flex; align-items:center; justify-content:space-between; padding:0.75rem; border-radius:0.75rem; border:1px solid #e6f4ec; background:#ffffff }
+.transaction-left { display:flex; gap:0.75rem; align-items:center }
+.transaction-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#ecfdf5; color:#065f46; font-weight:700 }
+.transaction-info { display:flex; flex-direction:column }
+.transaction-recipient { font-weight:700 }
+.transaction-date { font-size:0.85rem; color:#6b7280 }
+.transaction-right { text-align:right }
+.transaction-amount { font-weight:800 }
+.sent-amount { color:#dc2626 }
+.received-amount { color:#065f46 }
+
+/* Add Funds form (shared in Wallet.css) */
+.add-funds-container { max-width:720px; margin:0 auto; padding:1.25rem }
+.add-funds-header { display:flex; align-items:center; gap:1rem }
+.add-funds-header h1 { margin:0 }
+.add-funds-form { margin-top:1rem; background:#fff; border:1px solid #e6f4ec; padding:1rem; border-radius:0.75rem }
+.amount-input-wrapper { display:flex; align-items:center; gap:0.5rem }
+.currency-symbol { color:#065f46; font-weight:700; padding:0.45rem 0.6rem; background:#ecfdf5; border-radius:0.5rem }
+.amount-input { padding:0.6rem 0.8rem; border:1px solid #e6f4ec; border-radius:0.6rem; width:160px }
+.quick-amounts { display:flex; gap:0.5rem; margin-top:0.6rem }
+.quick-amount-btn { background:#f1f5f9; padding:0.45rem 0.65rem; border-radius:0.5rem; border:1px solid #e2e8f0; cursor:pointer }
+
+.payment-methods { display:flex; gap:0.5rem; margin-top:0.5rem }
+.payment-option { flex:1; display:flex; justify-content:space-between; align-items:center; padding:0.6rem; border-radius:0.6rem; border:1px solid #eefaf2; background:#f8fffb; cursor:pointer }
+.payment-option.selected { border-color:#10b981; box-shadow:0 6px 18px rgba(16,185,129,0.08); background:#f0fdf4 }
+.payment-icon { font-size:1.2rem }
+.payment-label { font-weight:700 }
+
+.amount-preview { margin-top:0.8rem; padding:0.75rem; border-radius:0.6rem; background:#ecfdf5; color:#065f46; display:flex; justify-content:space-between; align-items:center }
+.continue-btn { margin-top:1rem; width:100%; padding:0.85rem; background:linear-gradient(135deg,#10b981,#059669); color:white; border:none; border-radius:0.75rem; font-weight:800; cursor:pointer }
+.continue-btn:disabled { opacity:0.7; cursor:not-allowed }
+
+@media (max-width:768px) {
+  .balance-card { flex-direction:column; align-items:flex-start }
+  .amount-input { width:100% }
+  .payment-methods { flex-direction:column }
+}

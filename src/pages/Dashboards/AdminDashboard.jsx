@@ -18,16 +18,17 @@ export default function AdminDashboard() {
   const user = useSelector((state) => state.auth.user)
   const isAuthLoading = useSelector((state) => state.auth.isLoading)
   const transactions = useSelector((state) => state.transactions.list)
+  const users = useSelector((state) => state.users.list)
   const isTransactionLoading = useSelector((state) => state.transactions.isLoading)
 
   const metrics = useMemo(() => {
     const totalVolume = transactions.reduce((sum, transaction) => sum + (Number(transaction.amount) || 0), 0)
     const revenue = transactions.reduce((sum, transaction) => sum + (Number(transaction.fee ?? transaction.transactionFee) || 0), 0)
-    return { totalUsers: user ? 1 : 0, totalTransactions: transactions.length, totalVolume, revenue }
-  }, [transactions, user])
+    return { totalUsers: users.length, totalTransactions: transactions.length, totalVolume, revenue }
+  }, [transactions, users])
 
   const recentTransactions = useMemo(() => transactions.slice(0, 5), [transactions])
-  const recentUsers = user ? [user] : []
+  const recentUsers = users.slice(0, 5)
   const isLoading = isAuthLoading || isTransactionLoading
 
   if (!isAuthLoading && !user) return <Navigate to="/auth/login" replace />

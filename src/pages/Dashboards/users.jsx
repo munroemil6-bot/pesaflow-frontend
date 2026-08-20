@@ -1,79 +1,21 @@
 import React, { useMemo, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { setUserStatus } from '../../redux/slices/usersSlice'
 
 export default function Users() {
+  const dispatch = useDispatch()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [selectedUser, setSelectedUser] = useState(null)
-
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: 'Myles Munroe',
-      email: 'myles@pesaflow.com',
-      phone: '+254 700 111 222',
-      status: 'Active',
-      joined: '2026-08-18',
-    },
-    {
-      id: 2,
-      name: 'Mason',
-      email: 'mason@pesaflow.com',
-      phone: '+254 701 222 333',
-      status: 'Active',
-      joined: '2026-08-17',
-    },
-    {
-      id: 3,
-      name: 'Nasra Hassan',
-      email: 'nasra@pesaflow.com',
-      phone: '+254 702 333 444',
-      status: 'Active',
-      joined: '2026-08-16',
-    },
-    {
-      id: 4,
-      name: 'Naomi Nafula',
-      email: 'naomi@pesaflow.com',
-      phone: '+254 703 444 555',
-      status: 'Active',
-      joined: '2026-08-15',
-    },
-    {
-      id: 5,
-      name: 'John Kamau',
-      email: 'john@pesaflow.com',
-      phone: '+254 704 555 666',
-      status: 'Active',
-      joined: '2026-08-14',
-    },
-    {
-      id: 6,
-      name: 'Aisha Mohammed',
-      email: 'aisha@pesaflow.com',
-      phone: '+254 705 666 777',
-      status: 'Inactive',
-      joined: '2026-08-13',
-    },
-    {
-      id: 7,
-      name: 'Brian Otieno',
-      email: 'brian@pesaflow.com',
-      phone: '+254 706 777 888',
-      status: 'inative',
-      joined: '2026-08-12',
-    },
-    {
-      id: 8,
-      name: 'Grace Wanjiku',
-      email: 'grace@pesaflow.com',
-      phone: '+254 707 888 999',
-      status: 'Active',
-      joined: '2026-08-11',
-    },
-  ])
+  const users = useSelector((state) => state.users.list)
+  const displayUsers = users.map((user) => ({
+    ...user,
+    name: user.fullName,
+    joined: user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-KE') : 'Recently',
+  }))
 
   const filteredUsers = useMemo(() => {
-    return users.filter((user) => {
+    return displayUsers.filter((user) => {
       const matchesSearch =
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -84,31 +26,12 @@ export default function Users() {
 
       return matchesSearch && matchesStatus
     })
-  }, [users, searchTerm, statusFilter])
+  }, [displayUsers, searchTerm, statusFilter])
 
-  const handleDelete = (userId) => {
-    const confirmed = window.confirm(
-      'Are you sure you want to remove this user?'
-    )
-
-    if (!confirmed) return
-
-    setUsers((currentUsers) =>
-      currentUsers.filter((user) => user.id !== userId)
-    )
-  }
-
-  const handleToggleStatus = (userId) => {
-    setUsers((currentUsers) =>
-      currentUsers.map((user) =>
-        user.id === userId
-          ? {
-              ...user,
-              status: user.status === 'Active' ? 'Inactive' : 'Active',
-            }
-          : user
-      )
-    )
+  const handleToggleStatus = (user) => {
+    if (user.role === 'admin') return
+    dispatch(setUserStatus({ userId: user.id, status: user.status === 'Active' ? 'Inactive' : 'Active' }))
+    if (selectedUser?.id === user.id) setSelectedUser((current) => ({ ...current, status: user.status === 'Active' ? 'Inactive' : 'Active' }))
   }
 
   return (
@@ -190,9 +113,12 @@ export default function Users() {
                 <th className="px-5 py-4">Name</th>
                 <th className="px-5 py-4">Email</th>
                 <th className="px-5 py-4">Phone</th>
+                <th className="px-5 py-4">Balance</th>
+                <th className="px-5 py-4">Password</th>
+                <th className="px-5 py-4">Transfers</th>
                 <th className="px-5 py-4">Status</th>
                 <th className="px-5 py-4">Joined</th>
-                <th className="px-5 py-4">Actions</th>
+                <th className="px-5 py-4">Account</th>
               </tr>
             </thead>
 
@@ -213,6 +139,18 @@ export default function Users() {
                     {user.phone}
                   </td>
 
+                  <td className="px-5 py-4 text-sm font-semibold text-gray-900">
+                    KSh {Number(user.balance || 0).toLocaleString('en-KE')}
+                  </td>
+
+                  <td className="px-5 py-4 font-mono text-sm text-gray-600">
+                    {user.password || 'Not set'}
+                  </td>
+
+                  <td className="px-5 py-4 text-sm text-gray-600">
+                    {user.transactionCount || 0}
+                  </td>
+
                   <td className="px-5 py-4">
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs font-medium ${
@@ -231,29 +169,8 @@ export default function Users() {
 
                   <td className="px-5 py-4">
                     <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedUser(user)}
-                        className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50"
-                      >
-                        View
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleToggleStatus(user.id)}
-                        className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-100"
-                      >
-                        {user.status === 'Active' ? 'Disable' : 'Activate'}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(user.id)}
-                        className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-100"
-                      >
-                        Delete
-                      </button>
+                      <button type="button" onClick={() => setSelectedUser(user)} className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50">View details</button>
+                      {user.role !== 'admin' && <button type="button" onClick={() => handleToggleStatus(user)} className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-100">{user.status === 'Active' ? 'Deactivate' : 'Activate'}</button>}
                     </div>
                   </td>
                 </tr>
@@ -278,6 +195,14 @@ export default function Users() {
 
                   <p className="mt-1 text-sm text-gray-500">
                     {user.phone}
+                  </p>
+
+                  <p className="mt-3 text-sm font-semibold text-gray-900">
+                    KSh {Number(user.balance || 0).toLocaleString('en-KE')} · {user.transactionCount || 0} transfers
+                  </p>
+
+                  <p className="mt-1 font-mono text-sm text-gray-500">
+                    Password: {user.password || 'Not set'}
                   </p>
                 </div>
 
@@ -304,22 +229,8 @@ export default function Users() {
                 >
                   View
                 </button>
+                {user.role !== 'admin' && <button type="button" onClick={() => handleToggleStatus(user)} className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700">{user.status === 'Active' ? 'Deactivate' : 'Activate'}</button>}
 
-                <button
-                  type="button"
-                  onClick={() => handleToggleStatus(user.id)}
-                  className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700"
-                >
-                  {user.status === 'Active' ? 'Disable' : 'Activate'}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleDelete(user.id)}
-                  className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700"
-                >
-                  Delete
-                </button>
               </div>
             </div>
           ))}
@@ -397,6 +308,36 @@ export default function Users() {
 
               <div>
                 <p className="text-xs font-medium uppercase text-gray-500">
+                  Wallet balance
+                </p>
+
+                <p className="mt-1 text-sm font-semibold text-gray-900">
+                  KSh {Number(selectedUser.balance || 0).toLocaleString('en-KE')}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium uppercase text-gray-500">
+                  Login password
+                </p>
+
+                <p className="mt-1 font-mono text-sm text-gray-900">
+                  {selectedUser.password || 'Not set'}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium uppercase text-gray-500">
+                  Transfers
+                </p>
+
+                <p className="mt-1 text-sm text-gray-900">
+                  {selectedUser.transactionCount || 0}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium uppercase text-gray-500">
                   Status
                 </p>
 
@@ -421,6 +362,8 @@ export default function Users() {
                 </p>
               </div>
             </div>
+
+            {selectedUser.role !== 'admin' && <button type="button" onClick={() => handleToggleStatus(selectedUser)} className="mt-5 w-full rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-700 transition hover:bg-blue-100">{selectedUser.status === 'Active' ? 'Deactivate account' : 'Activate account'}</button>}
 
             <button
               type="button"

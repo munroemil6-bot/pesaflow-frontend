@@ -1,12 +1,16 @@
 
 import './App.css'
-import React, { Suspense } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import Navbar from './Components/Navbar'
 import Sidebar from './Components/Sidebar'
 import AdminSidebar from './Components/AdminSidebar'
 import Loader from './Components/Loader'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { hydrateWallet } from './redux/slices/walletSlice'
+import { hydrateBeneficiaries } from './redux/slices/beneficiarySlice'
+import { hydrateTransactions } from './redux/slices/transactionSlice'
+import { refreshUsers } from './redux/slices/usersSlice'
 
 const Landing = React.lazy(() => import('./pages/Landing/Landing'))
 const Login = React.lazy(() => import('./pages/Auth/Login'))
@@ -43,10 +47,19 @@ function ProtectedRoute({ children, adminOnly = false }) {
 
 function AppContent() {
   const location = useLocation()
+  const dispatch = useDispatch()
   const user = useSelector((state) => state.auth.user)
   const isPublicPage = location.pathname === '/' || location.pathname.startsWith('/auth/') || location.pathname.startsWith('/login') || location.pathname.startsWith('/register')
   const isAdminPage = location.pathname.startsWith('/admin/')
   const showAdminSidebar = !isPublicPage && isAdminPage && user?.role === 'admin'
+
+  useEffect(() => {
+    if (!user) return
+    dispatch(hydrateWallet(user.id))
+    dispatch(hydrateBeneficiaries(user.id))
+    dispatch(hydrateTransactions(user.role === 'admin' ? 'admin' : user.id))
+    dispatch(refreshUsers())
+  }, [dispatch, user])
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

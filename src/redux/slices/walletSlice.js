@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { getUserWallet, updateUserWallet } from '../../data/mockData'
 
 const walletSlice = createSlice({
   name: 'wallet',
@@ -13,14 +14,21 @@ const walletSlice = createSlice({
     setWallet(state, action) {
       return { ...state, ...action.payload, error: null }
     },
+    hydrateWallet(state, action) {
+      return { ...state, ...getUserWallet(action.payload), error: null }
+    },
     setBalance(state, action) {
       state.balance = Number(action.payload) || 0
     },
     addFunds(state, action) {
-      state.balance += Number(action.payload) || 0
+      const amount = typeof action.payload === 'object' ? action.payload.amount : action.payload
+      state.balance += Number(amount) || 0
+      if (action.payload?.userId) updateUserWallet(action.payload.userId, { balance: state.balance })
     },
     deductFunds(state, action) {
-      state.balance = Math.max(0, state.balance - (Number(action.payload) || 0))
+      const amount = typeof action.payload === 'object' ? action.payload.amount : action.payload
+      state.balance = Math.max(0, state.balance - (Number(amount) || 0))
+      if (action.payload?.userId) updateUserWallet(action.payload.userId, { balance: state.balance })
     },
     setWalletLoading(state, action) {
       state.isLoading = action.payload
@@ -31,5 +39,5 @@ const walletSlice = createSlice({
   },
 })
 
-export const { addFunds, deductFunds, setBalance, setWallet, setWalletError, setWalletLoading } = walletSlice.actions
+export const { addFunds, deductFunds, hydrateWallet, setBalance, setWallet, setWalletError, setWalletLoading } = walletSlice.actions
 export default walletSlice.reducer
