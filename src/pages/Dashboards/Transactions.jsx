@@ -1,83 +1,26 @@
 import React, { useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 export default function Transactions() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
 
-  const transactions = [
-    {
-      id: 'TX001',
-      sender: 'Myles Munroe',
-      receiver: 'Nasra Hassan',
-      amount: 5000,
-      status: 'Completed',
-      date: '2026-08-18',
-      type: 'Money Transfer',
-    },
-    {
-      id: 'TX002',
-      sender: 'Mason',
-      receiver: 'Naomi Nafula',
-      amount: 2500,
-      status: 'Completed',
-      date: '2026-08-17',
-      type: 'Money Transfer',
-    },
-    {
-      id: 'TX003',
-      sender: 'Nasra Hassan',
-      receiver: 'Myles Munroe',
-      amount: 10000,
-      status: 'Pending',
-      date: '2026-08-17',
-      type: 'Money Transfer',
-    },
-    {
-      id: 'TX004',
-      sender: 'Naomi Nafula',
-      receiver: 'Mason',
-      amount: 3500,
-      status: 'Completed',
-      date: '2026-08-16',
-      type: 'Money Transfer',
-    },
-    {
-      id: 'TX005',
-      sender: 'Myles Munroe',
-      receiver: 'Naomi Nafula',
-      amount: 7500,
-      status: 'Failed',
-      date: '2026-08-16',
-      type: 'Money Transfer',
-    },
-    {
-      id: 'TX006',
-      sender: 'John Kamau',
-      receiver: 'Aisha Mohammed',
-      amount: 4200,
-      status: 'Completed',
-      date: '2026-08-15',
-      type: 'Money Transfer',
-    },
-    {
-      id: 'TX007',
-      sender: 'Brian Otieno',
-      receiver: 'Grace Wanjiku',
-      amount: 8500,
-      status: 'Pending',
-      date: '2026-08-15',
-      type: 'Money Transfer',
-    },
-    {
-      id: 'TX008',
-      sender: 'Grace Wanjiku',
-      receiver: 'Mason',
-      amount: 3000,
-      status: 'Completed',
-      date: '2026-08-14',
-      type: 'Money Transfer',
-    },
-  ]
+  const storedTransactions = useSelector((state) => state.transactions.list)
+  const transactions = storedTransactions.map((transaction) => ({
+    ...transaction,
+    sender: transaction.sender || 'Customer',
+    receiver: transaction.receiver || transaction.recipient || 'Recipient',
+    status: normalizeStatus(transaction.status),
+    date: transaction.date || transaction.createdAt,
+    type: transaction.type || 'Money Transfer',
+  }))
+
+  const summary = {
+    total: transactions.length,
+    completed: transactions.filter((transaction) => transaction.status === 'Completed').length,
+    pending: transactions.filter((transaction) => transaction.status === 'Pending').length,
+    failed: transactions.filter((transaction) => transaction.status === 'Failed').length,
+  }
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter((transaction) => {
@@ -94,7 +37,7 @@ export default function Transactions() {
 
       return matchesSearch && matchesStatus
     })
-  }, [search, statusFilter])
+  }, [search, statusFilter, transactions])
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -178,6 +121,13 @@ export default function Transactions() {
         </div>
       </section>
 
+      <section className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <SummaryCard label="Total Transactions" value={summary.total} />
+        <SummaryCard label="Completed" value={summary.completed} tone="text-green-600" />
+        <SummaryCard label="Pending" value={summary.pending} tone="text-yellow-600" />
+        <SummaryCard label="Failed" value={summary.failed} tone="text-red-600" />
+      </section>
+
       {/* =========================
           TRANSACTIONS LIST
       ========================== */}
@@ -245,7 +195,7 @@ export default function Transactions() {
                     {/* Transaction ID */}
                     <td className="whitespace-nowrap px-5 py-4">
                       <span className="font-medium text-gray-900">
-                        {transaction.id}
+                        {transaction.id.replace(/^demo-/, '')}
                       </span>
                     </td>
 
@@ -322,51 +272,17 @@ export default function Transactions() {
         </div>
       </section>
 
-      {/* =========================
-          SUMMARY
-      ========================== */}
-      <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-
-        <div className="rounded-xl bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">
-            Total Transactions
-          </p>
-
-          <p className="mt-2 text-2xl font-bold text-gray-900">
-            {transactions.length}
-          </p>
-        </div>
-
-        <div className="rounded-xl bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">
-            Completed
-          </p>
-
-          <p className="mt-2 text-2xl font-bold text-green-600">
-            {
-              transactions.filter(
-                (transaction) => transaction.status === 'Completed'
-              ).length
-            }
-          </p>
-        </div>
-
-        <div className="rounded-xl bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">
-            Pending
-          </p>
-
-          <p className="mt-2 text-2xl font-bold text-yellow-600">
-            {
-              transactions.filter(
-                (transaction) => transaction.status === 'Pending'
-              ).length
-            }
-          </p>
-        </div>
-
-      </section>
-
     </div>
   )
+}
+
+function normalizeStatus(status) {
+  const value = String(status || 'pending').toLowerCase()
+  if (value === 'successful' || value === 'success' || value === 'completed') return 'Completed'
+  if (value === 'failed' || value === 'failure') return 'Failed'
+  return 'Pending'
+}
+
+function SummaryCard({ label, value, tone = 'text-gray-900' }) {
+  return <div className="rounded-xl bg-white p-5 shadow-sm"><p className="text-sm text-gray-500">{label}</p><p className={`mt-2 text-2xl font-bold ${tone}`}>{value}</p></div>
 }

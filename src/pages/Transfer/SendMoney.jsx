@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import './SendMoney.css';
 
 const SendMoney = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const beneficiaries = useSelector((state) => state.beneficiaries.list);
+  const walletBalance = useSelector((state) => state.wallet.balance);
   
   // State management
-  const [beneficiaries, setBeneficiaries] = useState([]);
   const [formData, setFormData] = useState({
     beneficiaryId: '',
+    recipientPhone: '',
     amount: '',
     description: ''
   });
@@ -17,17 +20,6 @@ const SendMoney = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [walletBalance, setWalletBalance] = useState(25450); // Mock balance
-
-  // Mock beneficiaries data
-  const mockBeneficiaries = [
-    { id: '1', name: 'John Kamau', phone: '0712345678', accountType: 'individual' },
-    { id: '2', name: 'Mary Wanjiku', phone: '0722345678', accountType: 'individual' },
-    { id: '3', name: 'Tech Solutions Ltd', phone: '0732345678', accountType: 'business' },
-    { id: '4', name: 'Peter Ochieng', phone: '0742345678', accountType: 'individual' },
-    { id: '5', name: 'Grace Akinyi', phone: '0752345678', accountType: 'individual' },
-  ];
-
   // Get query params
   const getQueryParams = () => {
     const params = new URLSearchParams(location.search);
@@ -41,14 +33,10 @@ const SendMoney = () => {
     const fetchBeneficiaries = async () => {
       setIsFetching(true);
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 800));
-        setBeneficiaries(mockBeneficiaries);
-        
         // Check for beneficiary_id in query params
         const { beneficiaryId } = getQueryParams();
         if (beneficiaryId) {
-          const beneficiary = mockBeneficiaries.find(b => b.id === beneficiaryId);
+          const beneficiary = beneficiaries.find(b => String(b.id) === beneficiaryId);
           if (beneficiary) {
             setFormData(prev => ({
               ...prev,
@@ -72,7 +60,7 @@ const SendMoney = () => {
     };
 
     fetchBeneficiaries();
-  }, [location.state, location.search]);
+  }, [beneficiaries, location.state, location.search]);
 
   // Get selected beneficiary object
   const getSelectedBeneficiary = () => {
@@ -83,9 +71,11 @@ const SendMoney = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Beneficiary validation
-    if (!formData.beneficiaryId) {
-      newErrors.beneficiary = 'Please select a beneficiary';
+    const phone = formData.recipientPhone.replace(/\s/g, '')
+    if (!formData.beneficiaryId && !phone) {
+      newErrors.recipient = 'Select a beneficiary or enter a phone number';
+    } else if (phone && !/^(07|01)\d{8}$/.test(phone)) {
+      newErrors.recipient = 'Enter a valid Kenyan phone number';
     }
 
     // Amount validation
@@ -118,6 +108,7 @@ const SendMoney = () => {
 
     try {
       const beneficiary = getSelectedBeneficiary();
+      const recipientPhone = beneficiary?.phone || formData.recipientPhone.replace(/\s/g, '');
       
       // Simulate API call to save data
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -126,13 +117,13 @@ const SendMoney = () => {
       navigate('/transfer/confirm', {
         state: {
           transferData: {
-            recipient: beneficiary.name,
-            phone: beneficiary.phone,
+            recipient: beneficiary?.name || 'Phone recipient',
+            phone: recipientPhone,
             amount: Number(formData.amount),
             fee: calculateFee(Number(formData.amount)),
             total: Number(formData.amount) + calculateFee(Number(formData.amount)),
             description: formData.description || '',
-            beneficiaryId: beneficiary.id
+            beneficiaryId: beneficiary?.id || null
           }
         }
       });
@@ -163,11 +154,19 @@ const SendMoney = () => {
   const handleBeneficiarySelect = (id) => {
     setFormData(prev => ({
       ...prev,
-      beneficiaryId: id
+      beneficiaryId: id,
+      recipientPhone: ''
     }));
     setShowDropdown(false);
     if (errors.beneficiary) {
       setErrors({ ...errors, beneficiary: '' });
+    }
+  };
+
+  const handlePhoneChange = (value) => {
+    if (value === '' || /^[\d\s]+$/.test(value)) {
+      setFormData(prev => ({ ...prev, recipientPhone: value, beneficiaryId: '' }));
+      if (errors.recipient) setErrors(prev => ({ ...prev, recipient: '' }));
     }
   };
 
@@ -236,11 +235,18 @@ const SendMoney = () => {
       {/* Page Header */}
       <div className="send-money-header">
         <h1>Send Money</h1>
-        <p className="send-money-description">Transfer money to your saved beneficiaries</p>
+        <p className="send-money-description">Send to a phone number or saved beneficiary</p>
       </div>
 
       {/* Form */}
       <form onSubmit={handleContinue} className="send-money-form">
+        <div className="form-group">
+          <label htmlFor="recipient-phone">Phone number <span className="optional">(Optional if choosing a beneficiary)</span></label>
+          <input id="recipient-phone" type="tel" value={formData.recipientPhone} onChange={(e) => handlePhoneChange(e.target.value)} placeholder="0712345678" className={`recipient-input ${errors.recipient ? 'error' : ''}`} disabled={isLoading} />
+        </div>
+
+        <div className="recipient-divider">or choose a saved beneficiary</div>
+
         {/* Beneficiary Selection */}
         <div className="form-group">
           <label htmlFor="beneficiary">
@@ -248,7 +254,7 @@ const SendMoney = () => {
           </label>
           <div className="beneficiary-select-wrapper">
             <div 
-              className={`beneficiary-select ${errors.beneficiary ? 'error' : ''}`}
+              className={`beneficiary-select ${errors.recipient ? 'error' : ''}`}
               onClick={() => !isLoading && setShowDropdown(!showDropdown)}
             >
               <span className="beneficiary-display">
@@ -292,8 +298,8 @@ const SendMoney = () => {
               </div>
             )}
           </div>
-          {errors.beneficiary && (
-            <span className="error-message">{errors.beneficiary}</span>
+          {errors.recipient && (
+            <span className="error-message">{errors.recipient}</span>
           )}
         </div>
 
@@ -393,7 +399,7 @@ const SendMoney = () => {
         </div>
 
         {/* Amount Preview */}
-        {formData.amount && !errors.amount && Number(formData.amount) >= 100 && selectedBeneficiary && (
+        {formData.amount && !errors.amount && Number(formData.amount) >= 100 && (selectedBeneficiary || formData.recipientPhone) && (
           <div className="amount-preview">
             <div className="preview-row">
               <span>Amount:</span>

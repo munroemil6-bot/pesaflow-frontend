@@ -1,17 +1,8 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
-
-const mockTransactions = [
-  { id: '1', recipient: 'John Kamau', type: 'sent', amount: 500, status: 'successful', date: '2024-01-15T10:30:00' },
-  { id: '2', recipient: 'Mary Wanjiku', type: 'received', amount: 1000, status: 'successful', date: '2024-01-14T14:20:00' },
-  { id: '3', recipient: 'Peter Ochieng', type: 'sent', amount: 2000, status: 'pending', date: '2024-01-13T09:15:00' },
-  { id: '4', recipient: 'Grace Akinyi', type: 'sent', amount: 1500, status: 'failed', date: '2024-01-12T16:45:00' },
-  { id: '5', recipient: 'James Mwangi', type: 'received', amount: 3000, status: 'successful', date: '2024-01-11T11:00:00' },
-  { id: '6', recipient: 'Sarah Njoki', type: 'sent', amount: 750, status: 'pending', date: '2024-01-10T08:30:00' },
-  { id: '7', recipient: 'David Otieno', type: 'received', amount: 2500, status: 'failed', date: '2024-01-09T13:20:00' },
-];
 
 
 const TransactionItem = ({ transaction, onClick }) => {
@@ -60,10 +51,11 @@ const TransactionItem = ({ transaction, onClick }) => {
 
 const TransactionList = () => {
   const [currentFilter, setCurrentFilter] = useState('all');
+  const allTransactions = useSelector((state) => state.transactions.list)
   const filters = ['all', 'successful', 'pending', 'failed'];
   const transactions = currentFilter === 'all'
-    ? mockTransactions
-    : mockTransactions.filter((transaction) => transaction.status === currentFilter);
+    ? allTransactions
+    : allTransactions.filter((transaction) => transaction.status === currentFilter);
   
   return (
     <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">

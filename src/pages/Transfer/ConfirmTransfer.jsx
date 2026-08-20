@@ -1,11 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { addTransaction } from '../../redux/slices/transactionSlice';
+import { deductFunds } from '../../redux/slices/walletSlice';
 import './ConfirmTransfer.css';
 
 const ConfirmTransfer = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
   
   // State management
   const [transferData, setTransferData] = useState(null);
@@ -61,6 +66,19 @@ const ConfirmTransfer = () => {
       });
 
       // Success - navigate to status page
+      const transaction = {
+        ownerId: user.id,
+        recipient: transferData.recipient,
+        recipientPhone: transferData.phone,
+        amount: Number(transferData.amount),
+        fee: Number(transferData.fee || 0),
+        total: Number(transferData.total || transferData.amount),
+        status: 'successful',
+        type: 'sent',
+        date: new Date().toISOString(),
+      }
+      dispatch(addTransaction(transaction))
+      dispatch(deductFunds({ amount: transaction.total, userId: user.id }))
       navigate('/transfer/status', {
         state: {
           transactionData: {

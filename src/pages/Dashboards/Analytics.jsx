@@ -1,23 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 export default function Analytics() {
   const navigate = useNavigate()
 
-  const user = JSON.parse(localStorage.getItem('pesaflow_session'))?.user
+  const user = useSelector((state) => state.auth.user)
+  const transactions = useSelector((state) => state.transactions.list)
+  const users = useSelector((state) => state.users.list)
 
   const [dateRange, setDateRange] = useState('7')
-  const [isLoading, setIsLoading] = useState(true)
-
-  const [analyticsData, setAnalyticsData] = useState({
-    transactionVolume: [],
-    userGrowth: [],
-    revenue: [],
-    transactionTypes: [],
-    averageTransaction: 0,
-    successRate: 0,
-    dailyActiveUsers: 0,
-  })
 
   // Check that the logged-in user is an admin
   useEffect(() => {
@@ -26,86 +18,58 @@ export default function Analytics() {
     }
   }, [user, navigate])
 
-  // Load mock analytics data
-  useEffect(() => {
-    const fetchAnalyticsData = async () => {
-      setIsLoading(true)
+  const analyticsData = useMemo(() => {
+    const rangeDays = Number(dateRange)
+    const now = Date.now()
+    const rangeStart = now - rangeDays * 24 * 60 * 60 * 1000
+    const filteredTransactions = transactions.filter((transaction) => new Date(transaction.date || transaction.createdAt).getTime() >= rangeStart)
+    const bucketSize = Math.max(1, Math.ceil(rangeDays / 7))
+    const buckets = Array.from({ length: 7 }, (_, index) => {
+      const end = now - (6 - index) * bucketSize * 24 * 60 * 60 * 1000
+      const start = end - bucketSize * 24 * 60 * 60 * 1000
+      const bucketTransactions = filteredTransactions.filter((transaction) => {
+        const timestamp = new Date(transaction.date || transaction.createdAt).getTime()
+        return timestamp >= start && timestamp < end
+      })
+      const bucketUsers = users.filter((registeredUser) => new Date(registeredUser.createdAt).getTime() < end)
+      return {
+        day: new Intl.DateTimeFormat('en-KE', { weekday: 'short' }).format(new Date(end)),
+        value: bucketTransactions.reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0),
+        revenue: bucketTransactions.reduce((sum, transaction) => sum + Number(transaction.fee || 0), 0),
+        users: bucketUsers.length,
+      }
+    })
 
-      setTimeout(() => {
-        setAnalyticsData({
-          transactionVolume: [
-            { day: 'Mon', value: 420000 },
-            { day: 'Tue', value: 560000 },
-            { day: 'Wed', value: 480000 },
-            { day: 'Thu', value: 720000 },
-            { day: 'Fri', value: 850000 },
-            { day: 'Sat', value: 640000 },
-            { day: 'Sun', value: 910000 },
-          ],
+    const successfulTransactions = filteredTransactions.filter((transaction) => transaction.status === 'successful').length
+    const typeCounts = filteredTransactions.reduce((counts, transaction) => {
+      const key = transaction.type === 'received' ? 'Receive Money' : 'Send Money'
+      counts[key] = (counts[key] || 0) + 1
+      return counts
+    }, {})
+    const totalAmount = filteredTransactions.reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0)
+    const activeUserIds = new Set(filteredTransactions.filter((transaction) => new Date(transaction.date || transaction.createdAt).getTime() >= now - 24 * 60 * 60 * 1000).map((transaction) => transaction.ownerId))
+    const totalTypes = filteredTransactions.length || 1
 
-          userGrowth: [
-            { day: 'Mon', value: 820 },
-            { day: 'Tue', value: 890 },
-            { day: 'Wed', value: 950 },
-            { day: 'Thu', value: 1020 },
-            { day: 'Fri', value: 1110 },
-            { day: 'Sat', value: 1180 },
-            { day: 'Sun', value: 1250 },
-          ],
-
-          revenue: [
-            { day: 'Mon', value: 8500 },
-            { day: 'Tue', value: 11200 },
-            { day: 'Wed', value: 9800 },
-            { day: 'Thu', value: 14500 },
-            { day: 'Fri', value: 17200 },
-            { day: 'Sat', value: 12800 },
-            { day: 'Sun', value: 19400 },
-          ],
-
-          transactionTypes: [
-            { name: 'Send Money', value: 45 },
-            { name: 'Receive Money', value: 30 },
-            { name: 'Wallet Funding', value: 15 },
-            { name: 'Withdrawals', value: 10 },
-          ],
-
-          averageTransaction: 12500,
-          successRate: 94.6,
-          dailyActiveUsers: 684,
-        })
-
-        setIsLoading(false)
-      }, 800)
+    return {
+      transactionVolume: buckets.map(({ day, value }) => ({ day, value })),
+      userGrowth: buckets.map(({ day, users: value }) => ({ day, value })),
+      revenue: buckets.map(({ day, revenue: value }) => ({ day, value })),
+      transactionTypes: Object.entries(typeCounts).map(([name, count]) => ({ name, value: Math.round((count / totalTypes) * 100) })),
+      averageTransaction: filteredTransactions.length ? totalAmount / filteredTransactions.length : 0,
+      successRate: filteredTransactions.length ? (successfulTransactions / filteredTransactions.length) * 100 : 0,
+      dailyActiveUsers: activeUserIds.size,
     }
+  }, [dateRange, transactions, users])
 
-    fetchAnalyticsData()
-  }, [dateRange])
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-        <div className="flex min-h-[500px] items-center justify-center">
-          <div className="text-center">
-            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-green-600" />
-            <p className="text-gray-600">
-              Loading analytics...
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  const maxVolume = Math.max(
+  const maxVolume = Math.max(1,
     ...analyticsData.transactionVolume.map((item) => item.value)
   )
 
-  const maxUsers = Math.max(
+  const maxUsers = Math.max(1,
     ...analyticsData.userGrowth.map((item) => item.value)
   )
 
-  const maxRevenue = Math.max(
+  const maxRevenue = Math.max(1,
     ...analyticsData.revenue.map((item) => item.value)
   )
 

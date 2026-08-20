@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { addMockTransaction, getAllTransactions, getUserTransactions } from '../../data/mockData'
 
 const transactionSlice = createSlice({
   name: 'transactions',
@@ -8,8 +9,13 @@ const transactionSlice = createSlice({
       state.list = action.payload
       state.recent = action.payload.slice(0, 5)
     },
+    hydrateTransactions(state, action) {
+      state.list = action.payload === 'admin' ? getAllTransactions() : getUserTransactions(action.payload)
+      state.recent = state.list.slice(0, 5)
+    },
     addTransaction(state, action) {
-      state.list.unshift(action.payload)
+      const transaction = addMockTransaction(action.payload)
+      state.list.unshift(transaction)
       state.recent = state.list.slice(0, 5)
     },
     setSelectedTransaction(state, action) {
@@ -24,5 +30,5 @@ const transactionSlice = createSlice({
   },
 })
 
-export const { addTransaction, setSelectedTransaction, setTransactionError, setTransactionLoading, setTransactions } = transactionSlice.actions
+export const { addTransaction, hydrateTransactions, setSelectedTransaction, setTransactionError, setTransactionLoading, setTransactions } = transactionSlice.actions
 export default transactionSlice.reducer

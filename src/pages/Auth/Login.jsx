@@ -54,10 +54,10 @@
  * 
  * MOCK DATA:
  * Test accounts for Week 1:
- * - Email: myles@pesaflow.com, Password: password123
- * - Email: mason@pesaflow.com, Password: password123
- * - Email: nasra@pesaflow.com, Password: password123
- * - Email: naomi@pesaflow.com, Password: password123
+ * - Email: myles@gmail.com, Password: myles1234
+ * - Email: mason@gmail.com, Password: mason1234
+ * - Email: nasra@gmail.com, Password: nasra1234
+ * - Email: naomi@gmail.com, Password: naomi1234
  * 
  * BACKEND HANDOFF:
  * - Replace mock data with actual Flask API calls

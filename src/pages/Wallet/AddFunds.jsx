@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { addFunds } from '../../redux/slices/walletSlice';
 import './Wallet.css';
 
 const AddFunds = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const userId = useSelector((state) => state.auth.user?.id);
   
   // State management
   const [amount, setAmount] = useState('');
@@ -83,6 +87,7 @@ const AddFunds = () => {
       
       // Success - navigate to next page (TBD)
       console.log('Form submitted:', { amount: Number(amount), paymentMethod });
+      dispatch(addFunds({ amount: Number(amount), userId }));
       
       // For now, navigate to wallet or confirmation page
       // navigate('/wallet/confirmation'); // Uncomment when ready

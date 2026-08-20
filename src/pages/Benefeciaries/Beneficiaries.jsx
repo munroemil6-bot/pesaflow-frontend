@@ -1,40 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
-const mockBeneficiaries = [
-  { id: 1, name: 'John Kamau', phone: '0712 345 678', bank: 'KCB' },
-  { id: 2, name: 'Mary Wanjiku', phone: '0798 765 432', bank: 'Equity' },
-  { id: 3, name: 'Peter Mwangi', phone: '0744 111 222', bank: 'Co-op Bank' },
-];
-
-const STORAGE_KEY = 'pesaflow-beneficiaries';
-
-const getStoredBeneficiaries = () => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return mockBeneficiaries;
-
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : mockBeneficiaries;
-  } catch (error) {
-    return mockBeneficiaries;
-  }
-};
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteBeneficiary } from '../../redux/slices/beneficiarySlice';
 
 export default function BeneficiariesPage() {
   const navigate = useNavigate();
-  const [beneficiaries, setBeneficiaries] = useState(getStoredBeneficiaries);
-  const [isLoading] = useState(false);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(beneficiaries));
-  }, [beneficiaries]);
+  const dispatch = useDispatch();
+  const userId = useSelector((state) => state.auth.user?.id);
+  const beneficiaries = useSelector((state) => state.beneficiaries.list);
+  const isLoading = useSelector((state) => state.beneficiaries.isLoading);
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to remove this beneficiary?')) {
-      const updated = beneficiaries.filter((beneficiary) => beneficiary.id !== id);
-      setBeneficiaries(updated);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      dispatch(deleteBeneficiary({ id, userId }));
     }
   };
 
