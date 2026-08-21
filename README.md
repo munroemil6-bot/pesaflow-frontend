@@ -1,102 +1,103 @@
 # PesaFlow Frontend
 
-A modern financial transaction platform built with React and Vite, designed to facilitate secure money transfers, wallet management, and financial analytics.
-
-## Overview
-
-PesaFlow is a comprehensive frontend application that enables users to send money, manage beneficiaries, track transactions, and handle their digital wallets. The application includes both user and admin interfaces for complete financial management.
-
-## Technology Stack
-
-- React 18+ - Modern user interface framework
-- Vite - Fast build tool and development server with Hot Module Replacement
-- TailwindCSS - Utility-first CSS framework for responsive design
-- React Router - Client-side routing and navigation
-- Redux Toolkit - State management (setup ready)
-
+PesaFlow is a React and Vite money-transfer application for managing wallets, beneficiaries, transfers, transaction history, and platform analytics. It includes separate protected user and administrator workspaces.
 
 ## Features
 
-### User Features
-- User authentication (login, register, password recovery)
-- Dashboard with account overview
-- Wallet management with fund additions
-- Transaction history and filtering
-- Beneficiary management
-- Money transfer workflow with confirmation
-- User profile management
+### User workspace
 
-### Admin Features
-- Admin dashboard with key metrics
-- User management interface
-- Analytics and transaction reports
-- System monitoring
+- Register, log in, recover a password, and manage a profile
+- View wallet balance and add funds
+- Send money using a phone number or saved beneficiary
+- Review and filter personal transactions
+- Add, edit, and remove beneficiaries
+- Confirm transfers and view transfer status
 
-## Getting Started
+### Admin workspace
+
+- Dashboard metrics for users, transactions, volume, and revenue
+- User list with balances, transaction counts, account status, and account details
+- Activate or deactivate user accounts
+- Platform transaction search and status summaries
+- Analytics for transaction volume, revenue, user growth, transaction types, and active users
+
+## Demo credentials
+
+### Administrator
+
+- Email: `admin@gmail.com`
+- Password: `admin1234`
+
+### Seeded user accounts
+
+| User  | Email             | Password    |
+| ----- | ----------------- | ----------- |
+| Mason | `mason@gmail.com` | `mason1234` |
+| Myles | `myles@gmail.com` | `myles1234` |
+| Nasra | `nasra@gmail.com` | `nasra1234` |
+| Naomi | `naomi@gmail.com` | `naomi1234` |
+
+The application also seeds additional support accounts for admin analytics and user-management testing. Newly registered users start with a zero balance and no transactions or beneficiaries.
+
+## Technology stack
+
+- React 19
+- Vite
+- Tailwind CSS
+- React Router
+- Redux Toolkit and React Redux
+- Oxlint
+
+## Getting started
 
 ### Prerequisites
-- Node.js 16+ 
-- npm or yarn
 
-### Installation
+- Node.js 18 or newer
+- npm
 
-1. Install dependencies:
+### Install and run
+
 ```bash
 npm install
-```
-
-2. Start the development server:
-```bash
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173/`
+The development server normally runs at `http://localhost:5173/`. If that port is busy, Vite selects another available port.
 
-### Building for Production
+### Available scripts
 
 ```bash
-npm run build
+npm run dev       # Start the development server
+npm run build     # Create a production build in dist/
+npm run preview   # Preview the production build locally
+npm run lint      # Run Oxlint
 ```
 
-## Team Structure
+## Data and persistence
 
-This project is developed by a team of four developers working on a 5-day sprint:
+This frontend currently uses a localStorage-backed mock database. Users, wallets, beneficiaries, transactions, sessions, account statuses, and seeded analytics data are stored in the browser under the PesaFlow local database key.
 
-- Myles: Project leader, landing page, navigation, architecture oversight
-- Mason: Authentication flows, dashboards, analytics
-- Naomi: Wallet management, beneficiaries, admin pages
-- Nasra: Transactions, transfer flows, transaction management
+This is suitable for demonstration and frontend testing only. It is not production authentication: passwords are stored in browser data and each browser has its own separate dataset. A production release should replace the mock data layer with a secure backend, database, password hashing, and server-side authorization.
 
-## Development Guidelines
+## Deployment
 
-All page components include detailed comment instructions with:
-- Component requirements and wireframes
-- Form validation specifications
-- State management patterns
-- API integration points
-- Mock data structures
+The project is configured for Vercel with `vercel.json`, which rewrites client-side routes to `index.html`. This allows direct navigation and browser refreshes on routes such as `/admin/users` and `/admin/analytics`.
 
-Refer to `TEAM_INSTRUCTIONS.md` for comprehensive development guidelines and task breakdown.
+Vercel settings:
 
-## Architecture
+- Framework preset: `Vite`
+- Build command: `npm run build`
+- Output directory: `dist`
+- Install command: `npm install`
+- Root directory: repository root
 
-The application follows a component-based architecture with:
-- Protected routes for authenticated features
-- Lazy loading for optimized performance
-- Shared component library for consistency
-- Redux state management (ready for setup)
-- RESTful API integration pattern
+## Project structure
 
-## Next Steps
-
-1. Set up Redux store and slices
-2. Implement API service layer
-3. Build reusable UI components
-4. Implement page components following team assignments
-5. Integration testing and deployment
-
-## Documentation
-
-- TEAM_INSTRUCTIONS.md - Complete sprint plan and team assignments
-- COMPONENT_TEMPLATE.md - Component building patterns and guidelines
-- WEEK1_BUILD_CHECKLIST.md - Daily milestones and checklist
+- `src/pages/Auth/` - Login, registration, and password recovery
+- `src/pages/Dashboards/` - User dashboard, admin dashboard, users, transactions, and analytics
+- `src/pages/Transfer/` - Send, confirm, and transfer status flows
+- `src/pages/Wallet/` - Wallet and add-funds screens
+- `src/pages/Benefeciaries/` - Beneficiary management
+- `src/redux/` - Store and application slices
+- `src/data/mockData.js` - Local demo database and seeded records
+- `src/routes/` - Route definitions
