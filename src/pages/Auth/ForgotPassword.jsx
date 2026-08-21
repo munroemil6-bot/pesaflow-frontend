@@ -23,14 +23,14 @@
  * └─────────────────────────────────────┘
  * 
  * REQUIREMENTS TO BUILD:
- * ✅ Email or Phone input field
- * ✅ Send Reset Link button
- * ✅ Form validation
- * ✅ Loading state
- * ✅ Success message (reset link sent)
- * ✅ Error message display
- * ✅ "Back to Login" link
- * ✅ Responsive design
+ * - Email or Phone input field
+ * - Send Reset Link button
+ * - Form validation
+ * - Loading state
+ * - Success message (reset link sent)
+ * - Error message display
+ * - "Back to Login" link
+ * - Responsive design
  * 
  * FORM VALIDATION:
  * - Email or Phone required

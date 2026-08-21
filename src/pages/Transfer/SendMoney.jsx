@@ -290,7 +290,7 @@ const SendMoney = () => {
                         </span>
                       </div>
                       <span className="dropdown-item-type">
-                        {beneficiary.accountType === 'business' ? '🏢' : '👤'}
+                        {beneficiary.accountType === 'business' ? 'Business' : 'Individual'}
                       </span>
                     </div>
                   ))
@@ -419,7 +419,6 @@ const SendMoney = () => {
         {/* Submit Error */}
         {errors.submit && (
           <div className="submit-error">
-            <span className="error-icon">⚠️</span>
             {errors.submit}
           </div>
         )}

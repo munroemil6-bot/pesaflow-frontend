@@ -24,16 +24,16 @@
  * └─────────────────────────────────────┘
  * 
  * REQUIREMENTS TO BUILD:
- * ✅ Email/Phone input field
- * ✅ Password input field
- * ✅ Login button (disabled while loading)
- * ✅ "Forgot password?" link → /auth/forgot-password
- * ✅ "Register" link → /auth/register
- * ✅ Form validation (email/phone required, password required)
- * ✅ Loading state while submitting
- * ✅ Error message display
- * ✅ Success message after login
- * ✅ Responsive design (mobile-first with Tailwind)
+ * - Email/Phone input field
+ * - Password input field
+ * - Login button (disabled while loading)
+ * - "Forgot password?" link -> /auth/forgot-password
+ * - "Register" link -> /auth/register
+ * - Form validation (email/phone required, password required)
+ * - Loading state while submitting
+ * - Error message display
+ * - Success message after login
+ * - Responsive design (mobile-first with Tailwind)
  * 
  * FORM VALIDATION TO IMPLEMENT:
  * - Email: valid email format OR 10-digit phone number

@@ -10,9 +10,9 @@ const TransactionItem = ({ transaction, onClick }) => {
   
   const getStatusIcon = (status) => {
     switch(status) {
-      case 'successful': return '✓';
-      case 'pending': return '⏳';
-      case 'failed': return '✗';
+      case 'successful': return 'Successful';
+      case 'pending': return 'Pending';
+      case 'failed': return 'Failed';
       default: return '';
     }
   };

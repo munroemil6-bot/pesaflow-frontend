@@ -78,15 +78,12 @@ export default function Landing() {
               {/* Trust badges */}
               <div className="mt-12 flex flex-col gap-2 text-sm text-green-50">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">✓</span>
                   <span>No hidden fees. Transparent pricing.</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">✓</span>
                   <span>Bank-level security and encryption.</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">✓</span>
                   <span>Transfers complete in seconds.</span>
                 </div>
               </div>
@@ -215,7 +212,7 @@ export default function Landing() {
               </Button>
             </Link>
             <a href="#" className="text-white font-medium hover:text-green-50 transition flex items-center justify-center gap-2">
-              Learn more <span>→</span>
+              Learn more
             </a>
           </div>
         </div>

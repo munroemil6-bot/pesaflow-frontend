@@ -156,7 +156,7 @@ Thank you for using PesaFlow.
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-5">
           <h1 className="text-2xl font-bold text-slate-900">Transaction Details</h1>
           <span className="font-semibold text-emerald-600">
-            ✓ {transaction.status || "Successful"}
+            {transaction.status || "Successful"}
           </span>
         </div>
 
@@ -225,7 +225,7 @@ Thank you for using PesaFlow.
             <span className="text-slate-500">Status</span>
 
             <strong className="text-right font-semibold text-emerald-600">
-              ✓ {transaction.status || "Successful"}
+              {transaction.status || "Successful"}
             </strong>
           </div>
 

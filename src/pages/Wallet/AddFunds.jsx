@@ -118,11 +118,11 @@ const AddFunds = () => {
   // Get payment method icon
   const getPaymentMethodIcon = (method) => {
     const icons = {
-      mpesa: '📱',
-      bank: '🏦',
-      card: '💳'
+      mpesa: 'M-PESA',
+      bank: 'Bank',
+      card: 'Card'
     };
-    return icons[method] || '💰';
+    return icons[method] || 'Payment';
   };
 
   return (

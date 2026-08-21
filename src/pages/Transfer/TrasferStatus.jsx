@@ -78,7 +78,7 @@ Thank you for using PesaFlow!
   const getStatusConfig = (status) => {
     const configs = {
       successful: {
-        icon: '✅',
+        icon: 'Successful',
         title: 'Successful!',
         color: '#10b981',
         bgColor: '#d1fae5',
@@ -86,7 +86,7 @@ Thank you for using PesaFlow!
         textColor: '#065f46'
       },
       pending: {
-        icon: '⏳',
+        icon: 'Pending',
         title: 'Pending',
         color: '#f59e0b',
         bgColor: '#fef3c7',
@@ -94,7 +94,7 @@ Thank you for using PesaFlow!
         textColor: '#92400e'
       },
       failed: {
-        icon: '❌',
+        icon: 'Failed',
         title: 'Failed',
         color: '#ef4444',
         bgColor: '#fee2e2',
@@ -231,28 +231,27 @@ Thank you for using PesaFlow!
           className="action-btn download-btn"
           onClick={handleDownloadReceipt}
         >
-          📥 Download Receipt
+          Download Receipt
         </button>
         
         <button 
           className="action-btn dashboard-btn"
           onClick={handleBackToDashboard}
         >
-          🏠 Back to Dashboard
+          Back to Dashboard
         </button>
         
         <button 
           className="action-btn send-again-btn"
           onClick={handleSendAgain}
         >
-          🔄 Send Again
+          Send Again
         </button>
       </div>
 
       {/* Support Message */}
       {transactionData.status === 'failed' && (
         <div className="support-message">
-          <span className="support-icon">💡</span>
           <p>
             Transaction failed. Please check your balance and try again. 
             If the problem persists, contact support.
@@ -262,7 +261,6 @@ Thank you for using PesaFlow!
 
       {transactionData.status === 'pending' && (
         <div className="support-message pending">
-          <span className="support-icon">⏳</span>
           <p>
             Your transaction is being processed. You will receive a notification 
             once it's completed.

@@ -62,7 +62,7 @@ export default function Modal({isOpen, onClose, title, description, children, si
                 className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 aria-label="Close modal"
               >
-                ✕
+                Close
               </button>
             )}
           </div>

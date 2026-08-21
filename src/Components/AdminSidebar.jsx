@@ -5,7 +5,7 @@ import { logout } from '../redux/slices/authSlice'
 const adminMenuItems = [
   { label: 'Dashboard', to: '/admin/dashboard', icon: '▦' },
   { label: 'Analytics', to: '/admin/analytics', icon: '◔' },
-  { label: 'Users', to: '/admin/users', icon: '♙' },
+  { label: 'Users', to: '/admin/users', icon: 'U' },
   { label: 'Transactions', to: '/admin/transactions', icon: '↔' },
 ]
 

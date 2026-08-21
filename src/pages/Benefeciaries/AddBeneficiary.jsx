@@ -136,7 +136,6 @@ const AddBeneficiary = () => {
 
       {success && (
         <div className="success-message">
-          <span className="success-icon">✅</span>
           Beneficiary added successfully!
         </div>
       )}
@@ -213,7 +212,7 @@ const AddBeneficiary = () => {
                 onChange={() => setFormData((prev) => ({ ...prev, accountType: 'individual' }))}
                 disabled={isLoading}
               />
-              <label htmlFor="individual">👤 Individual</label>
+              <label htmlFor="individual">Individual</label>
             </div>
 
             <div
@@ -229,7 +228,7 @@ const AddBeneficiary = () => {
                 onChange={() => setFormData((prev) => ({ ...prev, accountType: 'business' }))}
                 disabled={isLoading}
               />
-              <label htmlFor="business">🏢 Business</label>
+              <label htmlFor="business">Business</label>
             </div>
           </div>
         </div>
@@ -307,7 +306,7 @@ const AddBeneficiary = () => {
             )}
             <div className="preview-item">
               <span className="preview-label">Type:</span>
-              <span>{formData.accountType === 'business' ? '🏢 Business' : '👤 Individual'}</span>
+              <span>{formData.accountType === 'business' ? 'Business' : 'Individual'}</span>
             </div>
             {formData.accountType === 'business' && formData.bankName && (
               <div className="preview-item">
@@ -320,7 +319,6 @@ const AddBeneficiary = () => {
 
         {errors.submit && (
           <div className="submit-error">
-            <span className="error-icon">⚠️</span>
             {errors.submit}
           </div>
         )}

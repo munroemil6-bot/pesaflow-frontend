@@ -138,7 +138,7 @@ const ConfirmTransfer = () => {
           <div className="recipient-info">
             <div className="recipient-name">{transferData.recipient}</div>
             <div className="recipient-phone">
-              📱 {formatPhone(transferData.phone)}
+              {formatPhone(transferData.phone)}
             </div>
           </div>
         </div>
@@ -193,7 +193,6 @@ const ConfirmTransfer = () => {
       {/* Error Message */}
       {error && (
         <div className="error-message">
-          <span className="error-icon">⚠️</span>
           {error}
         </div>
       )}

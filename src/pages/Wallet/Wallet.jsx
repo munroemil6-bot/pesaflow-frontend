@@ -100,7 +100,7 @@ const Wallet = () => {
 
         {filteredTransactions.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">📭</div>
+            <div className="empty-icon">No activity</div>
             <p>No transactions found</p>
             <p className="empty-subtext">
               {filterType === 'all' 
@@ -114,7 +114,7 @@ const Wallet = () => {
               <div key={transaction.id} className="transaction-item">
                 <div className="transaction-left">
                   <span className="transaction-icon">
-                    {transaction.type === 'sent' ? '😊' : '😞'}
+                    {transaction.type === 'sent' ? 'Sent' : 'Received'}
                   </span>
                   <div className="transaction-info">
                     <div className="transaction-recipient">
