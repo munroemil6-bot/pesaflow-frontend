@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../Components/Button';
-import Footer from '../../Components/Footer';
 
 export default function Landing() {
   const features = [
@@ -222,7 +221,6 @@ export default function Landing() {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 }
