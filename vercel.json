@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/api", "destination": "https://pesaflow-backend-wdbv.onrender.com/api" },
     { "source": "/api/:path*", "destination": "https://pesaflow-backend-wdbv.onrender.com/api/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
