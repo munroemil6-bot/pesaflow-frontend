@@ -70,11 +70,11 @@ To test the frontend against the deployed backend locally, create a `.env.local`
 VITE_API_URL=/api
 ```
 
-The Vite development proxy forwards `/api` to `https://pesaflow-backend-wdbv.onrender.com`, avoiding browser CORS issues. Vercel uses the same `/api` rewrite in `vercel.json`, so production requests use the deployed backend too. Then start the frontend with `npm run dev`. The `.env.local` file is ignored by git.
+The Vite development proxy forwards `/api` to `https://pesaflow-backend-wdbv.onrender.com`, avoiding browser CORS issues. Vercel uses the API proxy function in `api/[...path].js`, so production requests use the deployed backend too. Then start the frontend with `npm run dev`. The `.env.local` file is ignored by git.
 
 ### Deploy to Vercel
 
-Import this repository into Vercel with the `Vite` framework preset. Use `npm run build` as the build command and `dist` as the output directory. No API environment variable is required because the Vercel rewrite proxies `/api` to the deployed backend. If `VITE_API_URL` already exists in Vercel, set it to `/api` or remove it, then redeploy.
+Import this repository into Vercel with the `Vite` framework preset. Use `npm run build` as the build command and `dist` as the output directory. No API environment variable is required because the Vercel function proxies `/api` to the deployed backend. If `VITE_API_URL` already exists in Vercel, set it to `/api` or remove it, then redeploy.
 
 ### Available scripts
 
