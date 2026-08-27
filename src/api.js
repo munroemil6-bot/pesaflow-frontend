@@ -1,5 +1,5 @@
 const configuredApiUrl = import.meta.env.VITE_API_URL
-const API_BASE_URL = configuredApiUrl || '/api'
+const API_BASE_URL = configuredApiUrl || (import.meta.env.DEV ? '/api' : 'https://pesaflow-backend-wdbv.onrender.com/api')
 
 const readTokens = () => {
   try {
@@ -10,7 +10,11 @@ const readTokens = () => {
 }
 
 export const saveTokens = (tokens) => window.localStorage.setItem('pesaflow_tokens', JSON.stringify(tokens))
-export const clearTokens = () => window.localStorage.removeItem('pesaflow_tokens')
+export const clearTokens = () => {
+  window.localStorage.removeItem('pesaflow_tokens')
+  window.localStorage.removeItem('access')
+  window.localStorage.removeItem('refresh')
+}
 
 const getErrorMessage = (payload) => {
   if (typeof payload === 'string') return payload
@@ -26,12 +30,43 @@ const normalizeKenyanPhone = (phoneNumber) => {
 }
 
 export async function apiRequest(path, options = {}) {
+  return requestWithToken(path, options, readTokens().access, true)
+}
+
+async function requestWithToken(path, options, access, canRefresh) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) }
-  const access = readTokens().access
   if (access) headers.Authorization = `Bearer ${access}`
   const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers })
   const text = await response.text()
-  const payload = text ? JSON.parse(text) : null
+  let payload = null
+  try {
+    payload = text ? JSON.parse(text) : null
+  } catch {
+    payload = text
+  }
+
+  if (response.status === 401 && canRefresh && !path.endsWith('/accounts/refresh/')) {
+    const refresh = readTokens().refresh
+    if (refresh) {
+      const refreshResponse = await fetch(`${API_BASE_URL}/accounts/refresh/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh }),
+      })
+      const refreshText = await refreshResponse.text()
+      let refreshPayload = null
+      try {
+        refreshPayload = refreshText ? JSON.parse(refreshText) : null
+      } catch {
+        refreshPayload = null
+      }
+      if (refreshResponse.ok && refreshPayload?.access) {
+        saveTokens({ access: refreshPayload.access, refresh })
+        return requestWithToken(path, options, refreshPayload.access, false)
+      }
+    }
+  }
+
   if (!response.ok) throw new Error(getErrorMessage(payload))
   return payload
 }
