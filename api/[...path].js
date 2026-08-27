@@ -9,7 +9,7 @@ async function readBody(request) {
 export default async function handler(request, response) {
   const requestUrl = new URL(request.url, 'http://localhost')
   const backendPath = requestUrl.pathname.replace(/^\/api/, '') || '/'
-  const targetUrl = `${BACKEND_URL}${backendPath}${requestUrl.search}`
+  const targetUrl = `${BACKEND_URL}/api${backendPath}${requestUrl.search}`
   const headers = { ...request.headers }
   delete headers.host
   delete headers['content-length']
@@ -22,7 +22,11 @@ export default async function handler(request, response) {
     })
 
     response.statusCode = backendResponse.status
-    backendResponse.headers.forEach((value, key) => response.setHeader(key, value))
+    backendResponse.headers.forEach((value, key) => {
+      if (!['content-encoding', 'content-length', 'transfer-encoding'].includes(key)) {
+        response.setHeader(key, value)
+      }
+    })
     response.send(Buffer.from(await backendResponse.arrayBuffer()))
   } catch {
     response.statusCode = 502
