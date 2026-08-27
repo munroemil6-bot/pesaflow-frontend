@@ -1,9 +1,7 @@
 import React, { useMemo, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { setUserStatus } from '../../redux/slices/usersSlice'
+import { useSelector } from 'react-redux'
 
 export default function Users() {
-  const dispatch = useDispatch()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [selectedUser, setSelectedUser] = useState(null)
@@ -27,12 +25,6 @@ export default function Users() {
       return matchesSearch && matchesStatus
     })
   }, [displayUsers, searchTerm, statusFilter])
-
-  const handleToggleStatus = (user) => {
-    if (user.role === 'admin') return
-    dispatch(setUserStatus({ userId: user.id, status: user.status === 'Active' ? 'Inactive' : 'Active' }))
-    if (selectedUser?.id === user.id) setSelectedUser((current) => ({ ...current, status: user.status === 'Active' ? 'Inactive' : 'Active' }))
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
@@ -170,7 +162,6 @@ export default function Users() {
                   <td className="px-5 py-4">
                     <div className="flex gap-2">
                       <button type="button" onClick={() => setSelectedUser(user)} className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50">View details</button>
-                      {user.role !== 'admin' && <button type="button" onClick={() => handleToggleStatus(user)} className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-100">{user.status === 'Active' ? 'Deactivate' : 'Activate'}</button>}
                     </div>
                   </td>
                 </tr>
@@ -229,7 +220,6 @@ export default function Users() {
                 >
                   View
                 </button>
-                {user.role !== 'admin' && <button type="button" onClick={() => handleToggleStatus(user)} className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700">{user.status === 'Active' ? 'Deactivate' : 'Activate'}</button>}
 
               </div>
             </div>

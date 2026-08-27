@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addTransaction } from '../../redux/slices/transactionSlice';
-import { deductFunds } from '../../redux/slices/walletSlice';
+import { createTransfer } from '../../api';
 import './ConfirmTransfer.css';
 
 const ConfirmTransfer = () => {
@@ -49,42 +49,36 @@ const ConfirmTransfer = () => {
     setIsLoading(true);
 
     try {
-      // Week 1: Mock API call
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          // Simulate 90% success rate for testing
-          if (Math.random() > 0.1) {
-            resolve({
-              success: true,
-              transactionId: `TX-${Date.now()}`,
-              timestamp: new Date().toISOString()
-            });
-          } else {
-            reject(new Error('Transaction failed. Please try again.'));
-          }
-        }, 2000);
+      const response = await createTransfer({
+        ...(transferData.beneficiaryId
+          ? { recipient_id: transferData.beneficiaryId }
+          : { recipient_phone: transferData.phone.replace(/\s/g, '') }),
+        amount: transferData.amount,
+        description: transferData.description || '',
       });
 
       // Success - navigate to status page
       const transaction = {
         ownerId: user.id,
-        recipient: transferData.recipient,
+        id: response.id,
+        reference: response.reference,
+        recipient: response.recipient_name || transferData.recipient,
         recipientPhone: transferData.phone,
         amount: Number(transferData.amount),
         fee: Number(transferData.fee || 0),
-        total: Number(transferData.total || transferData.amount),
-        status: 'successful',
+        total: Number(response.total_amount || transferData.total || transferData.amount),
+        status: response.status || 'successful',
         type: 'sent',
         date: new Date().toISOString(),
       }
       dispatch(addTransaction(transaction))
-      dispatch(deductFunds({ amount: transaction.total, userId: user.id }))
       navigate('/transfer/status', {
         state: {
           transactionData: {
             ...transferData,
-            status: 'success',
-            timestamp: new Date().toISOString()
+            status: response.status || 'success',
+            transactionId: response.reference || response.id,
+            timestamp: response.created_at || new Date().toISOString()
           }
         }
       });

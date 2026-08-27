@@ -7,10 +7,10 @@ import AdminSidebar from './Components/AdminSidebar'
 import Loader from './Components/Loader'
 import { useDispatch, useSelector } from 'react-redux'
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { hydrateWallet } from './redux/slices/walletSlice'
-import { hydrateBeneficiaries } from './redux/slices/beneficiarySlice'
-import { hydrateTransactions } from './redux/slices/transactionSlice'
-import { refreshUsers } from './redux/slices/usersSlice'
+import { fetchWallet } from './redux/slices/walletSlice'
+import { fetchBeneficiaries } from './redux/slices/beneficiarySlice'
+import { fetchTransactions } from './redux/slices/transactionSlice'
+import { fetchUsers } from './redux/slices/usersSlice'
 
 const Landing = React.lazy(() => import('./pages/Landing/Landing'))
 const Login = React.lazy(() => import('./pages/Auth/Login'))
@@ -55,10 +55,10 @@ function AppContent() {
 
   useEffect(() => {
     if (!user) return
-    dispatch(hydrateWallet(user.id))
-    dispatch(hydrateBeneficiaries(user.id))
-    dispatch(hydrateTransactions(user.role === 'admin' ? 'admin' : user.id))
-    dispatch(refreshUsers())
+    dispatch(fetchWallet())
+    dispatch(fetchBeneficiaries())
+    dispatch(fetchTransactions(user.role))
+    if (user.role === 'admin') dispatch(fetchUsers())
   }, [dispatch, user])
 
   return (

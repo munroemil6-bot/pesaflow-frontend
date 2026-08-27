@@ -1,7 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getUserBeneficiaries, updateUserBeneficiaries } from '../../data/mockData'
+import { getBeneficiaries } from '../../api'
 
-export const fetchBeneficiaries = createAsyncThunk('beneficiaries/fetchBeneficiaries', async () => [])
+export const fetchBeneficiaries = createAsyncThunk('beneficiaries/fetchBeneficiaries', async () => {
+  const response = await getBeneficiaries()
+  return response.results || response
+})
 
 const beneficiarySlice = createSlice({
   name: 'beneficiaries',
@@ -9,23 +12,14 @@ const beneficiarySlice = createSlice({
   reducers: {
     addBeneficiary(state, action) {
       state.list.push(action.payload)
-      if (action.payload.userId) updateUserBeneficiaries(action.payload.userId, state.list)
     },
     updateBeneficiary(state, action) {
       const index = state.list.findIndex((beneficiary) => beneficiary.id === action.payload.id)
       if (index !== -1) state.list[index] = { ...state.list[index], ...action.payload }
-      if (action.payload.userId) updateUserBeneficiaries(action.payload.userId, state.list)
     },
     deleteBeneficiary(state, action) {
-      const { id, userId } = typeof action.payload === 'object' ? action.payload : { id: action.payload }
+      const { id } = typeof action.payload === 'object' ? action.payload : { id: action.payload }
       state.list = state.list.filter((beneficiary) => beneficiary.id !== id)
-      if (userId) updateUserBeneficiaries(userId, state.list)
-    },
-    hydrateBeneficiaries(state, action) {
-      state.list = getUserBeneficiaries(action.payload)
-    },
-    setBeneficiaries(state, action) {
-      state.list = action.payload
     },
     setBeneficiaryError(state, action) {
       state.error = action.payload
@@ -39,5 +33,5 @@ const beneficiarySlice = createSlice({
   },
 })
 
-export const { addBeneficiary, deleteBeneficiary, hydrateBeneficiaries, setBeneficiaries, setBeneficiaryError, updateBeneficiary } = beneficiarySlice.actions
+export const { addBeneficiary, deleteBeneficiary, setBeneficiaryError, updateBeneficiary } = beneficiarySlice.actions
 export default beneficiarySlice.reducer

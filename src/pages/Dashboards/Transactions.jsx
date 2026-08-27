@@ -8,8 +8,8 @@ export default function Transactions() {
   const storedTransactions = useSelector((state) => state.transactions.list)
   const transactions = storedTransactions.map((transaction) => ({
     ...transaction,
-    sender: transaction.sender || 'Customer',
-    receiver: transaction.receiver || transaction.recipient || 'Recipient',
+    sender: formatParty(transaction.sender || transaction.user || 'Customer'),
+    receiver: formatParty(transaction.receiver || transaction.recipient || 'Recipient'),
     status: normalizeStatus(transaction.status),
     date: transaction.date || transaction.createdAt,
     type: transaction.type || 'Money Transfer',
@@ -27,7 +27,7 @@ export default function Transactions() {
       const searchText = search.toLowerCase()
 
       const matchesSearch =
-        transaction.id.toLowerCase().includes(searchText) ||
+        String(transaction.id || '').toLowerCase().includes(searchText) ||
         transaction.sender.toLowerCase().includes(searchText) ||
         transaction.receiver.toLowerCase().includes(searchText)
 
@@ -195,7 +195,7 @@ export default function Transactions() {
                     {/* Transaction ID */}
                     <td className="whitespace-nowrap px-5 py-4">
                       <span className="font-medium text-gray-900">
-                        {transaction.id.replace(/^demo-/, '')}
+                        {String(transaction.id || '').replace(/^demo-/, '')}
                       </span>
                     </td>
 
@@ -281,6 +281,11 @@ function normalizeStatus(status) {
   if (value === 'successful' || value === 'success' || value === 'completed') return 'Completed'
   if (value === 'failed' || value === 'failure') return 'Failed'
   return 'Pending'
+}
+
+function formatParty(party) {
+  if (!party || typeof party !== 'object') return String(party || 'Unknown')
+  return party.full_name || party.fullName || party.name || party.email || party.phone || 'Unknown'
 }
 
 function SummaryCard({ label, value, tone = 'text-gray-900' }) {

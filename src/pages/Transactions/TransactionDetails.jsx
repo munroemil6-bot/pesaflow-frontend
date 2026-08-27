@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { getTransaction } from "../../api";
 
 function TransactionDetails() {
   const { id } = useParams();
@@ -26,18 +27,7 @@ function TransactionDetails() {
     setError("");
 
     try {
-      
-
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/transactions/${id}/`
-      );
-
-      if (!response.ok) {
-        throw new Error("Transaction not found");
-      }
-
-      const data = await response.json();
-
+      const data = await getTransaction(id);
       setTransaction(data);
     } catch (err) {
       console.error(err);

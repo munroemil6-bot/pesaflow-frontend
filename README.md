@@ -64,6 +64,18 @@ npm run dev
 
 The development server normally runs at `http://localhost:5173/`. If that port is busy, Vite selects another available port.
 
+To test the frontend against the deployed backend locally, create a `.env.local` file with:
+
+```bash
+VITE_API_URL=/api
+```
+
+The Vite development proxy forwards `/api` to `https://pesaflow-backend-wdbv.onrender.com`, avoiding browser CORS issues. Vercel uses the same `/api` rewrite in `vercel.json`, so production requests use the deployed backend too. Then start the frontend with `npm run dev`. The `.env.local` file is ignored by git.
+
+### Deploy to Vercel
+
+Import this repository into Vercel with the `Vite` framework preset. Use `npm run build` as the build command and `dist` as the output directory. No API environment variable is required because the Vercel rewrite proxies `/api` to the deployed backend. If `VITE_API_URL` already exists in Vercel, set it to `/api` or remove it, then redeploy.
+
 ### Available scripts
 
 ```bash

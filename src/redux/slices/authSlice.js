@@ -1,15 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import {
-  ADMIN_EMAIL,
-  ADMIN_PASSWORD,
-  findUser,
-  registerMockUser,
-} from '../../data/mockData'
+import { clearTokens, login, register, saveTokens } from '../../api'
 
 const readSession = () => {
   if (typeof window === 'undefined') return null
   try {
-    return JSON.parse(window.localStorage.getItem('pesaflow_session'))
+    const session = JSON.parse(window.localStorage.getItem('pesaflow_session'))
+    return session?.token && session.token !== 'demo-token' ? session : null
   } catch {
     return null
   }
@@ -26,30 +22,19 @@ const clearSession = () => {
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials) => {
-    const identifier = credentials.emailOrPhone.trim()
-    const isAdmin = identifier.toLowerCase() === ADMIN_EMAIL && credentials.password === ADMIN_PASSWORD
-    const user = isAdmin ? findUser(ADMIN_EMAIL) : findUser(identifier)
-
-    if (!user || user.password !== credentials.password) {
-      throw new Error('Invalid email or password.')
-    }
-
-    const { password: _password, ...safeUser } = user
-    const session = {
-      user: safeUser,
-      token: 'demo-token',
-    }
-
+    const response = await login(credentials)
+    saveTokens({ access: response.access, refresh: response.refresh })
+    const session = { user: response.user, token: response.access }
     saveSession(session)
-
     return session
   }
 )
 
 export const registerUser = createAsyncThunk('auth/registerUser', async (details) => {
-  const user = registerMockUser(details)
-  const { password: _password, ...safeUser } = user
-  const session = { user: safeUser, token: 'demo-token' }
+  await register(details)
+  const response = await login({ emailOrPhone: details.email, password: details.password })
+  saveTokens({ access: response.access, refresh: response.refresh })
+  const session = { user: response.user, token: response.access }
   saveSession(session)
   return session
 })
@@ -72,6 +57,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false
       state.error = null
       clearSession()
+      clearTokens()
     },
     updateProfile(state, action) {
       if (!state.user) return
