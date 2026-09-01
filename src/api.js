@@ -88,6 +88,10 @@ export const updateUserStatus = (userId, isActive) => apiRequest(`/admin-dashboa
   body: JSON.stringify({ is_active: isActive }),
 })
 export const getWallet = () => apiRequest('/wallet/')
+export const addFundsToWallet = (amount, description = 'Wallet funding') => apiRequest('/wallet/add-funds/', {
+  method: 'POST',
+  body: JSON.stringify({ amount, description }),
+})
 export const getBeneficiaries = () => apiRequest('/beneficiaries/?page_size=100')
 export const getTransactions = () => apiRequest('/transactions/')
 export const getTransaction = (id) => apiRequest(`/transactions/${id}/`)
