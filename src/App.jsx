@@ -57,18 +57,11 @@ function AppContent() {
   useEffect(() => {
     if (!user) return
 
-    const refreshUserData = () => {
-      dispatch(fetchWallet())
-      dispatch(fetchBeneficiaries())
-      dispatch(fetchTransactions(user.role))
-      if (user.role === 'admin') dispatch(fetchUsers())
-    }
-
-    refreshUserData()
-    const intervalId = setInterval(refreshUserData, 8000)
-
-    return () => clearInterval(intervalId)
-  }, [dispatch, user])
+    dispatch(fetchWallet())
+    dispatch(fetchBeneficiaries())
+    dispatch(fetchTransactions(user.role))
+    if (user.role === 'admin') dispatch(fetchUsers())
+  }, [dispatch, user?.id, user?.role])
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
