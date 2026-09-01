@@ -29,6 +29,11 @@ export default function AdminDashboard() {
 
   const recentTransactions = useMemo(() => transactions.slice(0, 5), [transactions])
   const recentUsers = users.slice(0, 5)
+  const mylesAccount = useMemo(() => {
+    const adminUser = users.find((item) => item.role === 'admin' || String(item.phone || '').replace(/\s+/g, '') === '0723274962')
+    return adminUser || null
+  }, [users])
+  const adminWalletBalance = Number(mylesAccount?.balance || 0)
   const isLoading = isAuthLoading || isTransactionLoading
 
   if (!isAuthLoading && !user) return <Navigate to="/auth/login" replace />
@@ -36,6 +41,7 @@ export default function AdminDashboard() {
 
   const cards = [
     { label: 'Total users', value: metrics.totalUsers.toLocaleString('en-KE'), hint: 'Registered accounts', tone: 'bg-blue-50 text-blue-700' },
+    { label: 'Myles wallet', value: formatCurrency(adminWalletBalance), hint: 'Admin account balance', tone: 'bg-emerald-50 text-emerald-700' },
     { label: 'Transactions', value: metrics.totalTransactions.toLocaleString('en-KE'), hint: 'Recorded transfers', tone: 'bg-violet-50 text-violet-700' },
     { label: 'Transfer volume', value: formatCurrency(metrics.totalVolume), hint: 'Across all transfers', tone: 'bg-emerald-50 text-emerald-700' },
     { label: 'Revenue', value: formatCurrency(metrics.revenue), hint: 'Fees collected', tone: 'bg-amber-50 text-amber-700' },
@@ -45,7 +51,7 @@ export default function AdminDashboard() {
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <header className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-sm font-semibold text-emerald-600">ADMIN WORKSPACE</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Admin dashboard</h1><p className="mt-2 text-sm text-slate-600">Monitor platform activity, transfers, and account growth.</p></div><Link to="/admin/analytics" className="rounded-xl border border-emerald-200 bg-white px-4 py-2.5 text-sm font-semibold text-emerald-700 shadow-sm hover:bg-emerald-50">View analytics</Link></header>
 
-      <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Platform metrics">
+      <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5" aria-label="Platform metrics">
         {cards.map((card) => <article key={card.label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><span className={`inline-flex rounded-lg px-2.5 py-1 text-xs font-bold ${card.tone}`}>{card.label}</span><p className="mt-4 text-2xl font-bold tracking-tight text-slate-900">{isLoading ? '—' : card.value}</p><p className="mt-1 text-sm text-slate-500">{card.hint}</p></article>)}
       </section>
 
