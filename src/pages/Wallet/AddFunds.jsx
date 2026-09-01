@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { initiateStkPush } from '../../api';
-import { fetchWallet } from '../../redux/slices/walletSlice';
+import { addFunds, fetchWallet } from '../../redux/slices/walletSlice';
 import './Wallet.css';
 
 const AddFunds = () => {
@@ -89,7 +89,11 @@ const AddFunds = () => {
       }
 
       const response = await initiateStkPush(phone, Number(amount));
+      const topUpAmount = Number(amount);
+
+      dispatch(addFunds({ amount: topUpAmount }));
       dispatch(fetchWallet());
+
       alert(response.customer_message || 'M-PESA prompt sent. Enter your PIN on your phone to complete payment.');
       navigate('/wallet', { replace: true });
     } catch (error) {

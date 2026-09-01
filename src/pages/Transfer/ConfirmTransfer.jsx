@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addTransaction, fetchTransactions } from '../../redux/slices/transactionSlice';
 import { createTransfer } from '../../api';
-import { fetchWallet } from '../../redux/slices/walletSlice';
+import { deductFunds, fetchWallet } from '../../redux/slices/walletSlice';
 import { ADMIN_TRANSFER_PHONE } from '../../utils/transferFees';
 import './ConfirmTransfer.css';
 
@@ -76,7 +76,10 @@ const ConfirmTransfer = () => {
         type: 'sent',
         date: new Date().toISOString(),
       }
+      const totalDeducted = Number(transferData.total || transferData.amount + (transferData.fee || 0));
+
       dispatch(addTransaction(transaction))
+      dispatch(deductFunds({ amount: totalDeducted }))
       dispatch(fetchWallet())
       dispatch(fetchTransactions(user.role))
       navigate('/transfer/status', {
