@@ -82,8 +82,8 @@ const SendMoney = () => {
     // Amount validation
     if (!formData.amount) {
       newErrors.amount = 'Amount is required';
-    } else if (isNaN(formData.amount) || Number(formData.amount) < 100) {
-      newErrors.amount = 'Minimum amount is KSh 100';
+    } else if (isNaN(formData.amount) || Number(formData.amount) < 10) {
+      newErrors.amount = 'Minimum amount is KSh 10';
     } else if (Number(formData.amount) > walletBalance) {
       newErrors.amount = `Amount exceeds wallet balance of KSh ${walletBalance.toLocaleString()}`;
     }
@@ -396,7 +396,7 @@ const SendMoney = () => {
         </div>
 
         {/* Amount Preview */}
-        {formData.amount && !errors.amount && Number(formData.amount) >= 100 && (selectedBeneficiary || formData.recipientPhone) && (
+        {formData.amount && !errors.amount && Number(formData.amount) >= 10 && (selectedBeneficiary || formData.recipientPhone) && (
           <div className="amount-preview">
             <div className="preview-row">
               <span>Amount:</span>

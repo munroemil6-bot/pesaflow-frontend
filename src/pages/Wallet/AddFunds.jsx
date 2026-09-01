@@ -21,8 +21,8 @@ const AddFunds = () => {
     // Amount validation
     if (!amount) {
       newErrors.amount = 'Amount is required';
-    } else if (isNaN(amount) || Number(amount) < 100) {
-      newErrors.amount = 'Minimum amount is KSh 100';
+    } else if (isNaN(amount) || Number(amount) < 10) {
+      newErrors.amount = 'Minimum amount is KSh 10';
     } else if (Number(amount) > 100000) {
       newErrors.amount = 'Maximum amount is KSh 100,000';
     } else if (amount.includes('.')) {
@@ -159,7 +159,7 @@ const AddFunds = () => {
             <span className="error-message">{errors.amount}</span>
           )}
           <div className="amount-hint">
-            <span>Min: KSh 100</span>
+            <span>Min: KSh 10</span>
             <span>Max: KSh 100,000</span>
           </div>
           <div className="quick-amounts">
