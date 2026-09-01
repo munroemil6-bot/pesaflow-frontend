@@ -56,10 +56,18 @@ function AppContent() {
 
   useEffect(() => {
     if (!user) return
-    dispatch(fetchWallet())
-    dispatch(fetchBeneficiaries())
-    dispatch(fetchTransactions(user.role))
-    if (user.role === 'admin') dispatch(fetchUsers())
+
+    const refreshUserData = () => {
+      dispatch(fetchWallet())
+      dispatch(fetchBeneficiaries())
+      dispatch(fetchTransactions(user.role))
+      if (user.role === 'admin') dispatch(fetchUsers())
+    }
+
+    refreshUserData()
+    const intervalId = setInterval(refreshUserData, 8000)
+
+    return () => clearInterval(intervalId)
   }, [dispatch, user])
 
   return (

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { initiateStkPush } from '../../api';
+import { fetchWallet } from '../../redux/slices/walletSlice';
 import './Wallet.css';
 
 const AddFunds = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const phone = useSelector((state) => state.auth.user?.phone);
   
   // State management
@@ -84,12 +86,9 @@ const AddFunds = () => {
       if (paymentMethod !== 'mpesa') throw new Error('Only M-PESA funding is connected to the backend.')
       if (!phone) throw new Error('Add a phone number to your profile before requesting an M-PESA payment.')
       const response = await initiateStkPush(phone, Number(amount));
-      
-      // For now, navigate to wallet or confirmation page
-      // navigate('/wallet/confirmation'); // Uncomment when ready
-      
-      // For demo, just show success alert
+      dispatch(fetchWallet())
       alert(response.customer_message || 'M-PESA prompt sent. Enter your PIN on your phone to complete payment.');
+      navigate('/wallet', { replace: true })
       
     } catch (error) {
       console.error('Error processing payment:', error);

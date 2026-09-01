@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { addTransaction } from '../../redux/slices/transactionSlice';
+import { addTransaction, fetchTransactions } from '../../redux/slices/transactionSlice';
 import { createTransfer } from '../../api';
+import { fetchWallet } from '../../redux/slices/walletSlice';
 import { ADMIN_TRANSFER_PHONE } from '../../utils/transferFees';
 import './ConfirmTransfer.css';
 
@@ -76,6 +77,8 @@ const ConfirmTransfer = () => {
         date: new Date().toISOString(),
       }
       dispatch(addTransaction(transaction))
+      dispatch(fetchWallet())
+      dispatch(fetchTransactions(user.role))
       navigate('/transfer/status', {
         state: {
           transactionData: {
