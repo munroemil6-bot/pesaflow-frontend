@@ -45,10 +45,27 @@ export default function UserDashboardLayout({ children }) {
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="flex h-16 items-center justify-between px-4 sm:px-6">
           <Link to="/dashboard" className="flex items-center gap-2.5 font-bold text-slate-900"><span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-600 text-white">P</span><span>PesaFlow</span></Link>
-          <div className="flex items-center gap-3"><div className="hidden text-right sm:block"><p className="text-xs text-slate-500">Welcome back</p><p className="text-sm font-semibold text-slate-900">{userName}</p></div><Link to="/profile" aria-label="Open profile" className="grid h-9 w-9 place-items-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-700">{initial}</Link><button type="button" onClick={() => setIsMenuOpen((open) => !open)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 lg:hidden" aria-expanded={isMenuOpen} aria-controls="user-navigation">Menu</button></div>
+          <div className="flex items-center gap-3">
+            <div className="hidden text-right sm:block"><p className="text-xs text-slate-500">Welcome back</p><p className="text-sm font-semibold text-slate-900">{userName}</p></div>
+            <Link to="/profile" aria-label="Open profile" className="grid h-9 w-9 place-items-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-700">{initial}</Link>
+            <button type="button" onClick={() => setIsMenuOpen((open) => !open)} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-200 text-xl text-slate-700 transition hover:bg-slate-100 lg:hidden" aria-expanded={isMenuOpen} aria-controls="user-navigation" aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}>
+              {isMenuOpen ? '✕' : '☰'}
+            </button>
+          </div>
         </div>
-        {isMenuOpen && <div id="user-navigation" className="border-t border-slate-200 bg-white lg:hidden">{renderNavigation(true)}<div className="px-4 pb-4"><button type="button" onClick={handleLogout} className="w-full rounded-xl bg-red-50 px-3 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100">Log out</button></div></div>}
       </header>
+
+      {isMenuOpen && (
+        <div className="lg:hidden">
+          <div className="fixed inset-0 z-20 bg-slate-900/30" onClick={() => setIsMenuOpen(false)} />
+          <aside id="user-navigation" className="fixed left-0 top-16 z-30 h-[calc(100vh-4rem)] w-72 border-r border-slate-200 bg-white shadow-xl">
+            {renderNavigation(true)}
+            <div className="mt-auto border-t border-slate-200 p-4">
+              <button type="button" onClick={handleLogout} className="w-full rounded-xl bg-red-50 px-3 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100">Log out</button>
+            </div>
+          </aside>
+        </div>
+      )}
 
       <div className="mx-auto flex max-w-screen-2xl">
         <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-64 shrink-0 border-r border-slate-200 bg-white lg:flex lg:flex-col">

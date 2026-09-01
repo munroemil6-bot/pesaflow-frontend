@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { ADMIN_TRANSFER_PHONE, calculateTransferFee } from '../../utils/transferFees';
 import './SendMoney.css';
 
 const SendMoney = () => {
@@ -120,10 +121,11 @@ const SendMoney = () => {
             recipient: beneficiary?.name || 'Phone recipient',
             phone: recipientPhone,
             amount: Number(formData.amount),
-            fee: calculateFee(Number(formData.amount)),
-            total: Number(formData.amount) + calculateFee(Number(formData.amount)),
+            fee: calculateTransferFee(Number(formData.amount)),
+            total: Number(formData.amount) + calculateTransferFee(Number(formData.amount)),
             description: formData.description || '',
-            beneficiaryId: beneficiary?.id || null
+            beneficiaryId: beneficiary?.id || null,
+            adminPhone: ADMIN_TRANSFER_PHONE
           }
         }
       });
@@ -138,12 +140,7 @@ const SendMoney = () => {
   };
 
   // Calculate transaction fee
-  const calculateFee = (amount) => {
-    if (amount <= 1000) return 10;
-    if (amount <= 5000) return 25;
-    if (amount <= 10000) return 50;
-    return 75;
-  };
+  const calculateFee = (amount) => calculateTransferFee(amount);
 
   // Handle cancel
   const handleCancel = () => {

@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addTransaction } from '../../redux/slices/transactionSlice';
 import { createTransfer } from '../../api';
+import { ADMIN_TRANSFER_PHONE } from '../../utils/transferFees';
 import './ConfirmTransfer.css';
 
 const ConfirmTransfer = () => {
@@ -35,10 +36,11 @@ const ConfirmTransfer = () => {
       recipient: 'John Kamau',
       phone: '0712 345 678',
       amount: 1000,
-      fee: 10,
-      total: 1010,
+      fee: 20,
+      total: 1020,
       description: 'Payment for services',
-      transactionId: 'TX-2024-001'
+      transactionId: 'TX-2024-001',
+      adminPhone: ADMIN_TRANSFER_PHONE
     };
     setTransferData(mockData);
   }, [location]);
@@ -55,6 +57,8 @@ const ConfirmTransfer = () => {
           : { recipient_phone: transferData.phone.replace(/\s/g, '') }),
         amount: transferData.amount,
         description: transferData.description || '',
+        fee: Number(transferData.fee || 0),
+        admin_phone: transferData.adminPhone || ADMIN_TRANSFER_PHONE,
       });
 
       // Success - navigate to status page
@@ -175,6 +179,13 @@ const ConfirmTransfer = () => {
         )}
 
         <div className="summary-divider"></div>
+
+        <div className="summary-section">
+          <div className="summary-label">Admin payout</div>
+          <div className="transaction-id">
+            {transferData.adminPhone || ADMIN_TRANSFER_PHONE}
+          </div>
+        </div>
 
         <div className="summary-section">
           <div className="summary-label">Transaction ID</div>
