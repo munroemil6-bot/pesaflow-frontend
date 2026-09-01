@@ -5,7 +5,13 @@ const readSession = () => {
   if (typeof window === 'undefined') return null
   try {
     const session = JSON.parse(window.localStorage.getItem('pesaflow_session'))
-    return session?.token && session.token !== 'demo-token' ? session : null
+    if (!(session?.token && session.token !== 'demo-token')) return null
+    if (session.user?.is_active === false) {
+      clearSession()
+      clearTokens()
+      return null
+    }
+    return session
   } catch {
     return null
   }
@@ -23,8 +29,12 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials) => {
     const response = await login(credentials)
+    const user = response.user || response
+    if (user?.is_active === false) {
+      throw new Error('Your account has been deactivated. Please contact the admin on 0723274962.')
+    }
     saveTokens({ access: response.access, refresh: response.refresh })
-    const session = { user: response.user, token: response.access }
+    const session = { user, token: response.access }
     saveSession(session)
     return session
   }
@@ -79,6 +89,15 @@ const authSlice = createSlice({
       .addCase(registerUser.pending, (state) => { state.isLoading = true; state.error = null })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false
+        if (action.payload.user?.is_active === false) {
+          state.user = null
+          state.token = null
+          state.isAuthenticated = false
+          state.error = 'Your account has been deactivated. Please contact the admin on 0723274962.'
+          clearSession()
+          clearTokens()
+          return
+        }
         state.user = action.payload.user
         state.token = action.payload.token
         state.isAuthenticated = true

@@ -83,6 +83,10 @@ export const register = (details) => apiRequest('/accounts/register/', {
 })
 export const getProfile = () => apiRequest('/accounts/profile/')
 export const getAdminUsers = () => apiRequest('/admin-dashboard/users/?page_size=100')
+export const updateUserStatus = (userId, isActive) => apiRequest(`/admin-dashboard/users/${userId}/`, {
+  method: 'PATCH',
+  body: JSON.stringify({ is_active: isActive }),
+})
 export const getWallet = () => apiRequest('/wallet/')
 export const getBeneficiaries = () => apiRequest('/beneficiaries/?page_size=100')
 export const getTransactions = () => apiRequest('/transactions/')

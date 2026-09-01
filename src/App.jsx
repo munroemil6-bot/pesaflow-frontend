@@ -40,6 +40,7 @@ function ProtectedRoute({ children, adminOnly = false }) {
   const { isAuthenticated, user } = useSelector((state) => state.auth)
 
   if (!isAuthenticated) return <Navigate to="/auth/login" replace />
+  if (user?.is_active === false) return <Navigate to="/auth/login" replace />
   if (adminOnly && user?.role !== 'admin') return <Navigate to="/dashboard" replace />
 
   return children

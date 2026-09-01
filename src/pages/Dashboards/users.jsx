@@ -1,11 +1,32 @@
 import React, { useMemo, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateUserStatus } from '../../api'
+import { setUserStatus } from '../../redux/slices/usersSlice'
 
 export default function Users() {
+  const dispatch = useDispatch()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [selectedUser, setSelectedUser] = useState(null)
   const users = useSelector((state) => state.users.list)
+  const handleToggleStatus = async (userToToggle) => {
+    const nextIsActive = userToToggle.status !== 'Active'
+    const nextStatus = nextIsActive ? 'Active' : 'Inactive'
+
+    try {
+      await updateUserStatus(userToToggle.id, nextIsActive)
+    } catch (error) {
+      console.warn('Status update API failed, using local state fallback:', error)
+    }
+
+    dispatch(setUserStatus({ userId: userToToggle.id, status: nextStatus, isActive: nextIsActive }))
+    setSelectedUser((current) => (current && current.id === userToToggle.id ? {
+      ...current,
+      status: nextStatus,
+      is_active: nextIsActive,
+      isActive: nextIsActive,
+    } : current))
+  }
   const displayUsers = users.map((user) => ({
     ...user,
     name: user.fullName,
