@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { addFundsToWallet } from '../../api';
+import { useDispatch, useSelector } from 'react-redux';
+import { initiateStkPush } from '../../api';
 import { fetchWallet } from '../../redux/slices/walletSlice';
 import './Wallet.css';
 
 const AddFunds = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const phone = useSelector((state) => state.auth.user?.phone);
   
   // State management
   const [amount, setAmount] = useState('');
@@ -80,18 +81,21 @@ const AddFunds = () => {
     setIsLoading(true);
 
     try {
-      if (!paymentMethod) {
-        throw new Error('Please select a payment method.');
+      if (paymentMethod !== 'mpesa') {
+        throw new Error('Only M-PESA funding is connected to the backend.');
+      }
+      if (!phone) {
+        throw new Error('Add a phone number to your profile before requesting an M-PESA payment.');
       }
 
-      const response = await addFundsToWallet(Number(amount), 'Wallet funding');
-      await dispatch(fetchWallet());
-      alert(response.message || `KSh ${Number(amount).toLocaleString()} was added to your wallet.`);
+      const response = await initiateStkPush(phone, Number(amount));
+      dispatch(fetchWallet());
+      alert(response.customer_message || 'M-PESA prompt sent. Enter your PIN on your phone to complete payment.');
       navigate('/wallet', { replace: true });
     } catch (error) {
-      console.error('Error processing wallet funding:', error);
+      console.error('Error processing payment:', error);
       setErrors({
-        submit: error.message || 'Failed to add funds. Please try again.'
+        submit: error.message || 'Failed to process payment. Please try again.'
       });
     } finally {
       setIsLoading(false);
