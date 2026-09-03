@@ -22,6 +22,14 @@ const getErrorMessage = (payload) => {
   return Object.values(payload || {}).flat().join(' ') || 'The request could not be completed.'
 }
 
+export class ApiError extends Error {
+  constructor(message, status) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+  }
+}
+
 const normalizeKenyanPhone = (phoneNumber) => {
   const phone = String(phoneNumber || '').replace(/[\s-]/g, '')
   if (phone.startsWith('0')) return `254${phone.slice(1)}`
@@ -67,7 +75,7 @@ async function requestWithToken(path, options, access, canRefresh) {
     }
   }
 
-  if (!response.ok) throw new Error(getErrorMessage(payload))
+  if (!response.ok) throw new ApiError(getErrorMessage(payload), response.status)
   return payload
 }
 
@@ -87,7 +95,7 @@ export const updateUserStatus = (userId, isActive) => apiRequest(`/admin-dashboa
   method: 'PATCH',
   body: JSON.stringify({ is_active: isActive }),
 })
-export const getWallet = () => apiRequest('/wallet/')
+export const getWallet = () => apiRequest('/wallet/balance/')
 export const addFundsToWallet = (amount, description = 'Wallet funding') => apiRequest('/wallet/add-funds/', {
   method: 'POST',
   body: JSON.stringify({ amount, description }),
@@ -99,5 +107,5 @@ export const getAdminTransactions = (query = '?page_size=100') => apiRequest(`/a
 export const createTransfer = (data) => apiRequest('/transactions/', { method: 'POST', body: JSON.stringify(data) })
 export const initiateStkPush = (phoneNumber, amount) => apiRequest('/payments/stk-push/', {
   method: 'POST',
-  body: JSON.stringify({ phone_number: normalizeKenyanPhone(phoneNumber), amount }),
+  body: JSON.stringify({ phone_number: normalizeKenyanPhone(phoneNumber), amount: String(amount) }),
 })

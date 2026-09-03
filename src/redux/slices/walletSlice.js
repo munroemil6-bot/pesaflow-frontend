@@ -9,6 +9,7 @@ const walletSlice = createSlice({
     balance: 0,
     currency: 'KES',
     accountNumber: null,
+    pendingPayment: null,
     isLoading: false,
     error: null,
   },
@@ -19,9 +20,11 @@ const walletSlice = createSlice({
     setBalance(state, action) {
       state.balance = Number(action.payload) || 0
     },
-    addFunds(state, action) {
-      const amount = typeof action.payload === 'object' ? action.payload.amount : action.payload
-      state.balance += Number(amount) || 0
+    setPendingPayment(state, action) {
+      state.pendingPayment = action.payload
+    },
+    clearPendingPayment(state) {
+      state.pendingPayment = null
     },
     deductFunds(state, action) {
       const amount = typeof action.payload === 'object' ? action.payload.amount : action.payload
@@ -40,5 +43,5 @@ const walletSlice = createSlice({
     .addCase(fetchWallet.rejected, (state, action) => { state.isLoading = false; state.error = action.error.message })
 })
 
-export const { addFunds, deductFunds, setBalance, setWallet, setWalletError, setWalletLoading } = walletSlice.actions
+export const { clearPendingPayment, deductFunds, setBalance, setPendingPayment, setWallet, setWalletError, setWalletLoading } = walletSlice.actions
 export default walletSlice.reducer

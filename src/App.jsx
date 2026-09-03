@@ -63,6 +63,10 @@ function AppContent() {
     if (user.role === 'admin') dispatch(fetchUsers())
   }, [dispatch, user?.id, user?.role])
 
+  useEffect(() => {
+    if (user && location.pathname === '/dashboard') dispatch(fetchWallet())
+  }, [dispatch, location.pathname, user])
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {!isPublicPage && <Navbar />}

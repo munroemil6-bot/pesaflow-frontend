@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { initiateStkPush } from '../../api';
-import { addFunds, fetchWallet } from '../../redux/slices/walletSlice';
-import './Wallet.css';
+import { setPendingPayment } from '../../redux/slices/walletSlice';
 
 const AddFunds = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const phone = useSelector((state) => state.auth.user?.phone);
+  const currentBalance = useSelector((state) => state.wallet.balance);
   
   // State management
   const [amount, setAmount] = useState('');
@@ -88,18 +88,26 @@ const AddFunds = () => {
         throw new Error('Add a phone number to your profile before requesting an M-PESA payment.');
       }
 
-      const response = await initiateStkPush(phone, Number(amount));
-      const topUpAmount = Number(amount);
+      const response = await initiateStkPush(phone, amount);
 
-      dispatch(addFunds({ amount: topUpAmount }));
-      dispatch(fetchWallet());
+      dispatch(setPendingPayment({
+        paymentId: response.payment_id,
+        checkoutRequestId: response.checkout_request_id,
+        amount: Number(amount),
+        initialBalance: Number(currentBalance) || 0,
+      }));
 
-      alert(response.customer_message || 'M-PESA prompt sent. Enter your PIN on your phone to complete payment.');
+      alert(response.customer_message || 'Check your phone and enter your M-PESA PIN.');
       navigate('/wallet', { replace: true });
     } catch (error) {
       console.error('Error processing payment:', error);
+      const statusMessages = {
+        400: 'Enter a valid phone number and amount.',
+        401: 'You are not authenticated. Please log in again.',
+        502: 'M-PESA is temporarily unavailable. Please try again later.',
+      };
       setErrors({
-        submit: error.message || 'Failed to process payment. Please try again.'
+        submit: statusMessages[error.status] || error.message || 'Failed to process payment. Please try again.'
       });
     } finally {
       setIsLoading(false);
@@ -127,50 +135,52 @@ const AddFunds = () => {
   };
 
   return (
-    <div className="add-funds-container">
+    <div className="mx-auto max-w-3xl p-5">
       {/* Page Header */}
-      <div className="add-funds-header">
+      <div className="flex items-center gap-4">
         <button 
-          className="back-btn" 
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           onClick={() => navigate('/wallet')}
         >
           ← Back
         </button>
-        <h1>Add Funds</h1>
-        <p className="add-funds-description">Add money to your wallet</p>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Add Funds</h1>
+          <p className="text-sm text-slate-600">Add money to your wallet</p>
+        </div>
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="add-funds-form">
+      <form onSubmit={handleSubmit} className="mt-4 rounded-xl border border-emerald-100 bg-white p-4">
         {/* Amount Input */}
-        <div className="form-group">
+        <div className="space-y-2">
           <label htmlFor="amount">
             Amount
             <span className="required-star">*</span>
           </label>
-          <div className="amount-input-wrapper">
-            <span className="currency-symbol">KSh</span>
+          <div className="flex items-center gap-2">
+            <span className="rounded-lg bg-emerald-50 px-2.5 py-2 font-bold text-emerald-800">KSh</span>
             <input
               id="amount"
               type="text"
               value={amount}
               onChange={handleAmountChange}
               placeholder="Enter amount"
-              className={`amount-input ${errors.amount ? 'error' : ''}`}
+              className={`w-40 rounded-lg border px-3 py-2 outline-none ${errors.amount ? 'border-red-500' : 'border-emerald-100'}`}
               disabled={isLoading}
             />
           </div>
           {errors.amount && (
-            <span className="error-message">{errors.amount}</span>
+            <span className="text-sm text-red-600">{errors.amount}</span>
           )}
-          <div className="amount-hint">
+          <div className="flex justify-between text-xs text-slate-500">
             <span>Min: KSh 10</span>
             <span>Max: KSh 100,000</span>
           </div>
-          <div className="quick-amounts">
+          <div className="flex flex-wrap gap-2">
             <button 
               type="button" 
-              className="quick-amount-btn"
+              className="rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-2 text-sm hover:bg-slate-200"
               onClick={() => handleAmountChange({ target: { value: '500' } })}
               disabled={isLoading}
             >
@@ -178,7 +188,7 @@ const AddFunds = () => {
             </button>
             <button 
               type="button" 
-              className="quick-amount-btn"
+              className="rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-2 text-sm hover:bg-slate-200"
               onClick={() => handleAmountChange({ target: { value: '1000' } })}
               disabled={isLoading}
             >
@@ -186,7 +196,7 @@ const AddFunds = () => {
             </button>
             <button 
               type="button" 
-              className="quick-amount-btn"
+              className="rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-2 text-sm hover:bg-slate-200"
               onClick={() => handleAmountChange({ target: { value: '5000' } })}
               disabled={isLoading}
             >
@@ -194,7 +204,7 @@ const AddFunds = () => {
             </button>
             <button 
               type="button" 
-              className="quick-amount-btn"
+              className="rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-2 text-sm hover:bg-slate-200"
               onClick={() => handleAmountChange({ target: { value: '10000' } })}
               disabled={isLoading}
             >
@@ -204,27 +214,27 @@ const AddFunds = () => {
         </div>
 
         {/* Payment Method */}
-        <div className="form-group">
+        <div className="mt-6 space-y-2">
           <label>
             Payment Method
             <span className="required-star">*</span>
           </label>
-          <div className="payment-methods">
+          <div className="flex gap-2 max-md:flex-col">
             {['mpesa', 'bank', 'card'].map((method) => (
               <div 
                 key={method}
-                className={`payment-option ${paymentMethod === method ? 'selected' : ''}`}
+                className={`flex flex-1 cursor-pointer items-center justify-between rounded-lg border p-2.5 ${paymentMethod === method ? 'border-emerald-500 bg-emerald-50 shadow-md shadow-emerald-500/10' : 'border-emerald-50 bg-emerald-50/40'}`}
                 onClick={() => !isLoading && handlePaymentMethodChange(method)}
               >
-                <div className="payment-option-content">
-                  <span className="payment-icon">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">
                     {getPaymentMethodIcon(method)}
                   </span>
-                  <span className="payment-label">
+                  <span className="font-bold">
                     {getPaymentMethodLabel(method)}
                   </span>
                 </div>
-                <div className="payment-radio">
+                <div>
                   <input
                     type="radio"
                     id={`payment-${method}`}
@@ -240,13 +250,13 @@ const AddFunds = () => {
             ))}
           </div>
           {errors.paymentMethod && (
-            <span className="error-message">{errors.paymentMethod}</span>
+            <span className="text-sm text-red-600">{errors.paymentMethod}</span>
           )}
         </div>
 
         {/* Amount Preview */}
         {amount && !errors.amount && (
-          <div className="amount-preview">
+          <div className="mt-4 flex items-center justify-between rounded-lg bg-emerald-50 p-3 text-emerald-800">
             <span>You're about to add:</span>
             <strong>{formatCurrency(amount)}</strong>
           </div>
@@ -254,7 +264,7 @@ const AddFunds = () => {
 
         {/* Submit Error */}
         {errors.submit && (
-          <div className="submit-error">
+          <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
             {errors.submit}
           </div>
         )}
@@ -262,12 +272,12 @@ const AddFunds = () => {
         {/* Continue Button */}
         <button 
           type="submit" 
-          className="continue-btn"
+          className="mt-4 w-full rounded-xl border-0 bg-gradient-to-br from-emerald-500 to-emerald-600 p-3 font-extrabold text-white hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
           disabled={isLoading}
         >
           {isLoading ? (
             <>
-              <span className="spinner-small"></span>
+              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>
               Processing...
             </>
           ) : (
