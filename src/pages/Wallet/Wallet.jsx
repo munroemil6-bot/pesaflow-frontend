@@ -64,6 +64,10 @@ const Wallet = () => {
     navigate('/wallet/add-funds');
   };
 
+  const handleWithdraw = () => {
+    navigate('/wallet/withdraw');
+  };
+
   // Format currency
   const formatCurrency = (amount) => {
     return `KSh ${amount.toLocaleString()}`;
@@ -103,9 +107,14 @@ const Wallet = () => {
         <div className="flex flex-col gap-1">
           <div className="text-sm opacity-95">Available Balance</div>
           <div className="text-3xl font-extrabold">{formatCurrency(balance)}</div>
-          <button className="mt-2 w-fit rounded-xl border border-white/15 bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:opacity-95" onClick={handleAddFunds}>
-            + Add Funds
-          </button>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button className="rounded-xl border border-white/15 bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:opacity-95" onClick={handleAddFunds}>
+              + Add Funds
+            </button>
+            <button className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:-translate-y-0.5 hover:bg-emerald-50" onClick={handleWithdraw}>
+              Withdraw
+            </button>
+          </div>
         </div>
       </div>
 

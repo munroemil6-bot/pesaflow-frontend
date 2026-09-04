@@ -22,6 +22,7 @@ const Analytics = React.lazy(() => import('./pages/Dashboards/Analytics'))
 const Users = React.lazy(() => import('./pages/Dashboards/users'))
 const Wallet = React.lazy(() => import('./pages/Wallet/Wallet'))
 const AddFunds = React.lazy(() => import('./pages/Wallet/AddFunds'))
+const WithdrawFunds = React.lazy(() => import('./pages/Wallet/WithdrawFunds'))
 const Beneficiaries = React.lazy(() => import('./pages/Benefeciaries/Beneficiaries'))
 const AddBeneficiary = React.lazy(() => import('./pages/Benefeciaries/AddBeneficiary'))
 const Transactions = React.lazy(() => import('./pages/Transactions/Transactions'))
@@ -99,6 +100,10 @@ function AppContent() {
               <Route 
                 path="/wallet/add-funds" 
                 element={<ProtectedRoute><AddFunds /></ProtectedRoute>} 
+              />
+              <Route
+                path="/wallet/withdraw"
+                element={<ProtectedRoute><WithdrawFunds /></ProtectedRoute>}
               />
               <Route 
                 path="/beneficiaries" 

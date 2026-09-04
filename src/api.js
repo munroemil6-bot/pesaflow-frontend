@@ -100,6 +100,10 @@ export const addFundsToWallet = (amount, description = 'Wallet funding') => apiR
   method: 'POST',
   body: JSON.stringify({ amount, description }),
 })
+export const withdrawFromWallet = (amount, phoneNumber) => apiRequest('/wallet/withdraw/', {
+  method: 'POST',
+  body: JSON.stringify({ amount: String(amount), phone_number: normalizeKenyanPhone(phoneNumber) }),
+})
 export const getBeneficiaries = () => apiRequest('/beneficiaries/?page_size=100')
 export const getTransactions = () => apiRequest('/transactions/')
 export const getTransaction = (id) => apiRequest(`/transactions/${id}/`)
